@@ -13,7 +13,32 @@
         android:layout_weight="1"
         android:gravity="center"/>
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/seekbar"
+        android:layout_weight="0">
+
+        <TextView
+            android:id="@+id/seekBarValueTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="current value "
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:id="@+id/distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="miles"
+            android:layout_toRightOf="@id/seekBarValueTextView" />
+
+    </RelativeLayout>
+
     <SeekBar
+        android:id="@+id/seekbar"
+        android:max="100"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"/>
@@ -35,6 +60,7 @@
                 android:hint="Imperial" />
 
             <Button
+                android:id="@+id/metric"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="Metric"
