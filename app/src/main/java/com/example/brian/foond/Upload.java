@@ -1,28 +1,27 @@
 package com.example.brian.foond;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 /**
- * Created by Brian on 1/29/2016.
+ * Created by Brian on 1/31/2016.
  */
-public class SignUp extends Activity {
+public class Upload extends Activity{
 
     private Button submitButton;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.sign_up);
+        this.setContentView(R.layout.upload);
 
         submitButton = (Button) findViewById(R.id.submit);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SignUp.this, Main.class);
-                startActivity(intent);
+                Toast.makeText(Upload.this, "The photo has been uploaded", Toast.LENGTH_LONG).show();
             }
         });
     }

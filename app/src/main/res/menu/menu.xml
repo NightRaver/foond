@@ -8,4 +8,19 @@
         android:title="@string/new_crime"
         app:showAsAction="ifRoom|withText" />
 
+    <item
+        android:id="@+id/upload"
+        android:title="Upload a picture"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/distance"
+        android:title="Distance"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/account"
+        android:title="Account"
+        android:showAsAction="never" />
+
 </menu>
