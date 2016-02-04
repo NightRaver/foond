@@ -7,16 +7,33 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.Toast;
 
 /**
  * Created by Brian on 1/30/2016.
  */
 public class Main extends AppCompatActivity{
+
+    private GridView gridView;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.main);
 
+        // Calls the grid view.
+        gridView = (GridView) findViewById(R.id.grid_view);
+        gridView.setAdapter(new ImageAdapter(this));
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(Main.this, Select.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -30,7 +47,6 @@ public class Main extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.upload:
-//                Toast.makeText(getBaseContext(), "Upload", Toast.LENGTH_LONG).show();
                 Intent upload = new Intent(this, Upload.class);
                 startActivity(upload);
                 break;
