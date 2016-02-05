@@ -5,9 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Brian on 2/3/2016.
@@ -16,52 +18,69 @@ public class ImageAdapter extends BaseAdapter {
 
     private Context context;
 
-    // This is just for sample pictures
-    private Integer[] mThumbIds = {
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7
-    };
+    private List<Food> foods = new ArrayList<Food>();
+    private LayoutInflater inflater;
+
 
     public ImageAdapter(Context context) {
-        this.context = context;
+        inflater = LayoutInflater.from(context);
+
+        foods.add(new Food(R.drawable.sample_0));
+        foods.add(new Food(R.drawable.sample_1));
+        foods.add(new Food(R.drawable.sample_2));
+        foods.add(new Food(R.drawable.sample_3));
+        foods.add(new Food(R.drawable.sample_4));
+        foods.add(new Food(R.drawable.sample_5));
+        foods.add(new Food(R.drawable.sample_6));
+        foods.add(new Food(R.drawable.sample_7));
+        foods.add(new Food(R.drawable.sample_2));
+        foods.add(new Food(R.drawable.sample_4));
+        foods.add(new Food(R.drawable.sample_6));
+        foods.add(new Food(R.drawable.sample_5));
+
     }
 
     @Override
     public int getCount() {
-        return mThumbIds.length;
+        return foods.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return foods.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return foods.get(position).foodId;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-        if(convertView == null) {
-            // If it's not recycled, initialize some attributes
-            imageView = new ImageView(this.context);
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        } else {
-            imageView = (ImageView) convertView;
+        View view = convertView;
+        ImageView picture;
+
+        if(view == null) {
+            view = inflater.inflate(R.layout.gridview_item, parent, false);
+            view.setTag(R.id.picture, view.findViewById(R.id.picture));
+            view.setTag(R.id.text, view.findViewById(R.id.text));
         }
 
-        imageView.setImageResource(mThumbIds[position]);
-        return imageView;
+        picture = (ImageView) view.getTag(R.id.picture);
+
+        Food food = (Food) getItem(position);
+
+        picture.setImageResource(food.foodId);
+
+        return view;
+    }
+
+
+    private class Food {
+        final int foodId;
+
+        Food(int foodId) {
+            this.foodId = foodId;
+        }
     }
 }
