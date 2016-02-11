@@ -63,7 +63,6 @@ public class ImageAdapter extends BaseAdapter {
         if(view == null) {
             view = inflater.inflate(R.layout.gridview_item, parent, false);
             view.setTag(R.id.picture, view.findViewById(R.id.picture));
-            view.setTag(R.id.text, view.findViewById(R.id.text));
         }
 
         picture = (ImageView) view.getTag(R.id.picture);

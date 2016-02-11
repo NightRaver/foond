@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,6 +32,10 @@ public class Main extends AppCompatActivity{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(Main.this, Select.class);
+                Log.i("TAG", "Hard code: " + R.drawable.sample_0);
+                Log.i("TAG", "Position: " + position);
+                Log.i("TAG", "ID: " + id);
+                intent.putExtra("foodId", (int) id);
                 startActivity(intent);
             }
         });
