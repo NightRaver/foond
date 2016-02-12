@@ -35,13 +35,38 @@ public class Yelp extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.i("TAG", "Did it enter");
+        YelpAPIFactory yelpAPIFactory = new YelpAPIFactory(
+                "uF70iaE55RtJ5aOCFPRXXQ",
+                "pk3brkYNIwPSWdKP-YwRnTk7Y9M",
+                "gLcpwL-ZNE3zIXGSJGoh4WI_ZfvgMb9Q",
+                "peiZEgUYyCGkpVStBbLOg3PMCiM"
+        );
+
+        // Make API requests to be executed in main thread so we can verify it easily.
+//        yelpAPIFactory = AsyncTestUtils.setToRunInMainThread(yelpAPIFactory);
+
+        yelpAPI = yelpAPIFactory.createAPI();
+
+        Log.i("YELP API: ", yelpAPI.toString());
+        Log.i("YELP API: ", String.valueOf(yelpAPI.getBusiness("https://api.yelp.com/v2/business/yelp-san-francisco")));
+        Log.i("YELP API: ", String.valueOf(yelpAPI.getPhoneSearch("15555555555")));
 
         Callback<SearchResponse> callback = new Callback<SearchResponse>() {
             @Override
             public void onResponse(Response<SearchResponse> response, Retrofit retrofit) {
+                Log.i("TAG", String.valueOf(response.body()));
+
+
+                if (response.isSuccess())
+                    Log.i("TAG", "I hope this works");
+                else
+                    Log.i("TAG", "I hope this works");
+
+                Log.i("TAG", "I hope this works");
+
                 SearchResponse searchResponse = response.body();
                 // Update UI text with the searchResponse.
+                
                 Log.i("TAG", "I hope this works");
             }
             @Override
