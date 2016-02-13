@@ -28,8 +28,10 @@ import retrofit.Retrofit;
 /**
  * Created by Brian on 2/10/2016.
  */
-public class Yelp extends Activity{
+public class Yelp extends Activity {
     private YelpAPI yelpAPI;
+    private Response<SearchResponse> response;
+    private Callback<SearchResponse> callback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +49,28 @@ public class Yelp extends Activity{
 
         yelpAPI = yelpAPIFactory.createAPI();
 
+        Map<String, String> params = new HashMap<>();
+        // general params
+        params.put("term", "food");
+        params.put("limit", "3");
+
+        // locale params
+        params.put("lang", "fr");
+
+        Call<SearchResponse> call = yelpAPI.search("San Francisco", params);
+        try {
+            response = call.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.i("TAG: ", "Something happened");
+        }
+
+
         Log.i("YELP API: ", yelpAPI.toString());
         Log.i("YELP API: ", String.valueOf(yelpAPI.getBusiness("https://api.yelp.com/v2/business/yelp-san-francisco")));
         Log.i("YELP API: ", String.valueOf(yelpAPI.getPhoneSearch("15555555555")));
 
-        Callback<SearchResponse> callback = new Callback<SearchResponse>() {
+        callback = new Callback<SearchResponse>() {
             @Override
             public void onResponse(Response<SearchResponse> response, Retrofit retrofit) {
                 Log.i("TAG", String.valueOf(response.body()));
@@ -66,16 +85,19 @@ public class Yelp extends Activity{
 
                 SearchResponse searchResponse = response.body();
                 // Update UI text with the searchResponse.
-                
+
                 Log.i("TAG", "I hope this works");
             }
             @Override
             public void onFailure(Throwable t) {
                 // HTTP error happened, do something to handle it.
-                Log.e("TAG", "It didn't work");
+                Log.e("TAG", "It didn't work", t);
             }
         };
+
+
     }
+
 
     @Before
     public void setUp() {
