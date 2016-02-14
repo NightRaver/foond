@@ -3,6 +3,9 @@
     package="com.example.brian.foond">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!--<uses-feature android:name="android.hardware.camera2"/>-->
+    <!--<uses-permission android:name="android.permission.CAMERA"/>-->
+    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
 
     <application
         android:allowBackup="true"
@@ -27,7 +30,10 @@
         </activity>
         
         <activity android:name=".Main">
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".Select">
@@ -43,10 +49,11 @@
         </activity>
 
         <activity android:name=".Yelp">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
+        </activity>
+
+        <activity android:name=".Camera">
+
         </activity>
 
     </application>

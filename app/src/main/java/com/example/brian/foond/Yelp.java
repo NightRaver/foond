@@ -65,35 +65,43 @@ public class Yelp extends Activity {
             Log.i("TAG: ", "Something happened");
         }
 
-
-        Log.i("YELP API: ", yelpAPI.toString());
-        Log.i("YELP API: ", String.valueOf(yelpAPI.getBusiness("https://api.yelp.com/v2/business/yelp-san-francisco")));
-        Log.i("YELP API: ", String.valueOf(yelpAPI.getPhoneSearch("15555555555")));
-
-        callback = new Callback<SearchResponse>() {
+        call.enqueue(new Callback<SearchResponse>() {
             @Override
             public void onResponse(Response<SearchResponse> response, Retrofit retrofit) {
-                Log.i("TAG", String.valueOf(response.body()));
-
-
-                if (response.isSuccess())
-                    Log.i("TAG", "I hope this works");
-                else
-                    Log.i("TAG", "I hope this works");
-
-                Log.i("TAG", "I hope this works");
-
                 SearchResponse searchResponse = response.body();
-                // Update UI text with the searchResponse.
-
-                Log.i("TAG", "I hope this works");
+//                Log.i("TAG: ", "Is this the response?" + searchResponse);
             }
+
             @Override
             public void onFailure(Throwable t) {
-                // HTTP error happened, do something to handle it.
-                Log.e("TAG", "It didn't work", t);
+
             }
-        };
+        });
+
+//        callback = new Callback<SearchResponse>() {
+//            @Override
+//            public void onResponse(Response<SearchResponse> response, Retrofit retrofit) {
+//                Log.i("TAG", String.valueOf(response.body()));
+//
+//
+//                if (response.isSuccess())
+//                    Log.i("TAG", "I hope this works");
+//                else
+//                    Log.i("TAG", "I hope this works");
+//
+//                Log.i("TAG", "I hope this works");
+//
+//                SearchResponse searchResponse = response.body();
+//                // Update UI text with the searchResponse.
+//
+//                Log.i("TAG", "I hope this works");
+//            }
+//            @Override
+//            public void onFailure(Throwable t) {
+//                // HTTP error happened, do something to handle it.
+//                Log.e("TAG", "It didn't work", t);
+//            }
+//        };
 
 
     }
