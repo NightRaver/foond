@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tanagent.android.brian.foond">
+    package="tanagent.brian.com.foond">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -25,7 +25,7 @@
         <activity android:name=".SignUp">
 
         </activity>
-        
+
         <activity android:name=".Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,9 +45,6 @@
 
         </activity>
 
-        <activity android:name=".Yelp">
-
-        </activity>
 
         <activity android:name=".Camera">
 

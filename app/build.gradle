@@ -1,18 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        config {
-            keyAlias 'MyAndroidKey'
-            keyPassword '0561413'
-            storeFile file('C:/Users/brian/keystores/android.jks')
-            storePassword '0561413'
-        }
-    }
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
+
     defaultConfig {
-        applicationId "com.tanagent.android.brian.foond"
+        applicationId "tanagent.brian.com.foond"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
@@ -22,10 +15,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
-        }
-        debug {
-            signingConfig signingConfigs.config
         }
     }
     packagingOptions {
