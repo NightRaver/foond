@@ -3,6 +3,7 @@
     package="tanagent.brian.com.foond">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -45,10 +46,11 @@
 
         </activity>
 
-
         <activity android:name=".Camera">
 
         </activity>
+
+        <activity android:name=".Yelp"/>
 
     </application>
 
