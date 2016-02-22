@@ -1,19 +1,29 @@
 package tanagent.brian.com.foond;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.yelp.clientlib.connection.YelpAPI;
 import com.yelp.clientlib.connection.YelpAPIFactory;
+import com.yelp.clientlib.entities.Business;
 import com.yelp.clientlib.entities.SearchResponse;
 import com.yelp.clientlib.entities.options.BoundingBoxOptions;
 import com.yelp.clientlib.entities.options.CoordinateOptions;
 
 import junit.framework.Assert;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Token;
+import org.scribe.model.Verb;
+import org.scribe.oauth.OAuthService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,86 +31,53 @@ import java.util.Map;
 
 import retrofit.Call;
 import retrofit.Callback;
+import retrofit.Converter;
 import retrofit.Response;
 import retrofit.Retrofit;
+import retrofit.http.GET;
+import tanagent.brian.com.foond.YelpParseClasses.Search;
+import tanagent.brian.com.foond.YelpParseClasses.YelpV2API;
 
 /**
  * Created by Brian on 2/10/2016.
  */
 public class Yelp extends Activity {
+    private static final String CONSUMER_KEY = "uF70iaE55RtJ5aOCFPRXXQ";
+    private static final String CONSUMER_SECRET = "pk3brkYNIwPSWdKP-YwRnTk7Y9M";
+    private static final String TOKEN = "gLcpwL-ZNE3zIXGSJGoh4WI_ZfvgMb9Q";
+    private static final String TOKEN_SECRET = "peiZEgUYyCGkpVStBbLOg3PMCiM";
+
     private YelpAPI yelpAPI;
     private Response<SearchResponse> response;
     private Callback<SearchResponse> callback;
+
+    Search places;
+
+    private Business business,loadedBusiness, favoritedBusiness;
+    private String name;
+    private String address;
+    private String city;
+    private String state;
+    private String zip;
+    private String phone;
+    private String rating;
+    private String url;
+    private String mobileUrl;
+    private String ratingUrl;
+    private String snippet;
+    private String locationInfo;
+    private double latitude, longitude;
+
+    // filters
+    private String location;
+    private String category;
+    private double distance = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        YelpAPIFactory yelpAPIFactory = new YelpAPIFactory(
-                "uF70iaE55RtJ5aOCFPRXXQ",
-                "pk3brkYNIwPSWdKP-YwRnTk7Y9M",
-                "gLcpwL-ZNE3zIXGSJGoh4WI_ZfvgMb9Q",
-                "peiZEgUYyCGkpVStBbLOg3PMCiM"
-        );
-
-        // Make API requests to be executed in main thread so we can verify it easily.
-//        yelpAPIFactory = AsyncTestUtils.setToRunInMainThread(yelpAPIFactory);
-
-        yelpAPI = yelpAPIFactory.createAPI();
-
-        Map<String, String> params = new HashMap<>();
-        // general params
-        params.put("term", "food");
-        params.put("limit", "3");
-
-        // locale params
-        params.put("lang", "fr");
-
-        Call<SearchResponse> call = yelpAPI.search("San Francisco", params);
-        try {
-            response = call.execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.i("TAG: ", "Something happened");
-        }
-
-        call.enqueue(new Callback<SearchResponse>() {
-            @Override
-            public void onResponse(Response<SearchResponse> response, Retrofit retrofit) {
-                SearchResponse searchResponse = response.body();
-//                Log.i("TAG: ", "Is this the response?" + searchResponse);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-
-            }
-        });
-
-//        callback = new Callback<SearchResponse>() {
-//            @Override
-//            public void onResponse(Response<SearchResponse> response, Retrofit retrofit) {
-//                Log.i("TAG", String.valueOf(response.body()));
-//
-//
-//                if (response.isSuccess())
-//                    Log.i("TAG", "I hope this works");
-//                else
-//                    Log.i("TAG", "I hope this works");
-//
-//                Log.i("TAG", "I hope this works");
-//
-//                SearchResponse searchResponse = response.body();
-//                // Update UI text with the searchResponse.
-//
-//                Log.i("TAG", "I hope this works");
-//            }
-//            @Override
-//            public void onFailure(Throwable t) {
-//                // HTTP error happened, do something to handle it.
-//                Log.e("TAG", "It didn't work", t);
-//            }
-//        };
+        setUp();
 
 
     }
@@ -108,17 +85,81 @@ public class Yelp extends Activity {
 
     @Before
     public void setUp() {
+        // This library uses a YelpAPI object to query against the API
         YelpAPIFactory yelpAPIFactory = new YelpAPIFactory(
-                "uF70iaE55RtJ5aOCFPRXXQ",
-                "pk3brkYNIwPSWdKP-YwRnTk7Y9M",
-                "gLcpwL-ZNE3zIXGSJGoh4WI_ZfvgMb9Q",
-                "peiZEgUYyCGkpVStBbLOg3PMCiM"
-        );
+                CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET);
 
         // Make API requests to be executed in main thread so we can verify it easily.
 //        yelpAPIFactory = AsyncTestUtils.setToRunInMainThread(yelpAPIFactory);
 
         yelpAPI = yelpAPIFactory.createAPI();
+
+        final Map<String, String> params = new HashMap<>();
+
+        // general params
+        params.put("term", "food");
+        params.put("limit", "3");
+
+        // locale params
+        params.put("lang", "fr");
+
+        // Execute the Call object to send the request
+        Call<SearchResponse> call = yelpAPI.search("San Francisco", params);
+        try {
+            Response<SearchResponse> response = call.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        // Pass in a Callback object to send request asynchronously
+        Callback<SearchResponse> callback = new Callback<SearchResponse>() {
+            @Override
+            public void onResponse(Response<SearchResponse> response, Retrofit retrofit) {
+                SearchResponse searchResponse = response.body();
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        };
+
+        call.enqueue(callback);
+    }
+
+    public void search() {
+        OAuthService service = new ServiceBuilder().provider(YelpV2API.class).
+                apiKey(CONSUMER_KEY).apiSecret(CONSUMER_SECRET).build();
+        Token accessToken = new Token(TOKEN, TOKEN_SECRET);
+        OAuthRequest request = (OAuthRequest) new OAuthRequest(Verb.GET,
+                "http://api.yelp.com/v2/search");
+
+        request.addQuerystringParameter("location", location);
+        request.addQuerystringParameter("category_filter", category);
+        if(distance != 0)
+            request.addQuerystringParameter("radius_filter", String.valueOf(distance));
+
+        request.addQuerystringParameter("sort", "1");
+
+        request.addQuerystringParameter("offset", "20");
+
+        request.addQuerystringParameter("limit", "20");
+
+        service.signRequest(accessToken, request);
+        org.scribe.model.Response response = request.send();
+        String rawData = response.getBody();
+
+        try {
+            JSONObject json = new JSONObject(rawData);
+            JSONArray businesses;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 

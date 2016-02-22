@@ -22,6 +22,14 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/example"
+        android:text="example"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Select Restaurant"
         android:textColor="#ffffff"
         android:background="#FF01082A"
