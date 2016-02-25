@@ -39,10 +39,6 @@
 
         </activity>
 
-        <activity android:name=".example">
-
-        </activity>
-
         <activity android:name=".Camera">
 
         </activity>
