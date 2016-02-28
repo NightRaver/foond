@@ -4,10 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -34,6 +38,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import retrofit.Call;
@@ -51,8 +56,9 @@ public class Yelp extends Activity {
     private static final String TOKEN_SECRET = "peiZEgUYyCGkpVStBbLOg3PMCiM";
 
     private YelpAPI yelpAPI;
-    //    private GPSTracker gps;
-    private static final int numOfBusinesses = 6;
+    private static final int numOfBusinesses = 15;
+    private static final double radiusFilter = 40000; // 25 miles (4000 meters)
+    private static final int sort = 1;
 
     private String restaurantName;
     private String restaurantAddress;
@@ -67,27 +73,32 @@ public class Yelp extends Activity {
     private LocationManager locationManager;
     private LocationListener locationListener;
 
-//    private GoogleApiClient mGoogleApiClient;
-    private String latitude;
-    private String longitude;
-    private Location mLastLocation;
+    private double latitude;
+    private double longitude;
+    private String currentLocation;
+
+    private String address;
+    private String city;
+    private String state;
+    private String country;
+    private String postalCode;
+    private String knownName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.yelp);
-        setUp();
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
+            // Called when the location is updated
             @Override
             public void onLocationChanged(Location location) {
-                lastLocation = location;
-                Log.i("Latitude: ", String.valueOf(location.getLatitude()));
-                Log.i("Longitude: ", String.valueOf(location.getLongitude()));
-
-                latitude = String.valueOf(location.getLatitude());
-                longitude = String.valueOf(location.getLongitude());
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+                Log.i("Latitude:", String.valueOf(location.getLatitude()));
+                Log.i("Longitude:", String.valueOf(location.getLongitude()));
+                setUp();
             }
 
             @Override
@@ -100,53 +111,33 @@ public class Yelp extends Activity {
 
             }
 
+            // Checks if the GPS is turned off
             @Override
             public void onProviderDisabled(String provider) {
-
+                Intent intent = new Intent(Settings.ACTION_LOCALE_SETTINGS);
+                startActivity(intent);
             }
         };
-        Log.i("Latitude2: ", latitude + "");
-        Log.i("Longitude2: ", longitude + "");
 
-//        buildGoogleApiClient();
-
+//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
-            // request permissions
-            //fine location
-            //coarse location
-
-
-            Log.i("TEST", "PERMISSION NOT GRANTED");
+            // Requested permissions for ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, AND INTERNET
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.INTERNET
+                }, 10);
+            }
             return;
+        } else {
+            configureButton();
         }
-        Log.i("TEST", "ABOUT TO REQUEST UPDATES");
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
-//        gps = new GPSTracker(this);
+    }
 
-//        if(gps.canGetLocation()) {
-//            double latitude = gps.getLatitude();
-//            double longitude = gps.getLongitude();
-//
-//            Log.i("LOCATION", "Your Location is -\nLat: " + latitude + "\nLong: " + longitude);
-//
-////            Toast.makeText(
-////                    getApplicationContext(),
-////                    "Your Location is -\nLat: " + latitude + "\nLong: "
-////                            + longitude, Toast.LENGTH_LONG).show();
-//        } else {
-//            gps.showSettingsAlert();
-//        }
-
-
+    @SuppressWarnings("ResourceType")
+    private void configureButton() {
+        locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
     }
 
     public void setUp() {
@@ -161,12 +152,35 @@ public class Yelp extends Activity {
         // general params
         params.put("term", "food");
         params.put("limit", String.valueOf(numOfBusinesses));
+        params.put("radius_filter", String.valueOf(radiusFilter));
+        params.put("sort", String.valueOf(sort));
 
         // locale params
-        params.put("lang", "fr");
+        params.put("lang", "en");
 
         // Execute the Call object to send the request
-        Call<SearchResponse> call = yelpAPI.search("San Francisco", params);
+        Log.i("Latitude1:", String.valueOf(latitude));
+        Log.i("Longitude1:", String.valueOf(longitude));
+        Geocoder geocoder;
+        List<Address> addresses;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            city = addresses.get(0).getLocality();
+            state = addresses.get(0).getAdminArea();
+            country = addresses.get(0).getCountryName();
+            postalCode = addresses.get(0).getPostalCode();
+            knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+            Log.i("GeoCoder", addresses.get(0).getAddressLine(0).toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Log.i("City", city);
+        Log.i("State", state);
+        Call<SearchResponse> call = yelpAPI.search(city + ", " + state, params);
 
         // Pass in a Callback object to send request asynchronously
         Callback<SearchResponse> callback = new Callback<SearchResponse>() {
@@ -194,18 +208,6 @@ public class Yelp extends Activity {
         };
         call.enqueue(callback);
     }
-
-//    protected synchronized void buildGoogleApiClient() {
-//
-//
-//        if (mGoogleApiClient == null) {
-//            mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                    .addConnectionCallbacks(this)
-//                    .addOnConnectionFailedListener(this)
-//                    .addApi(LocationServices.API)
-//                    .build();
-//        }
-//    }
 
     @Test
     public void testSearchByLocation() throws IOException {
@@ -274,47 +276,17 @@ public class Yelp extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 3, locationListener);
-    }
-
-//    @Override
-//    public void onConnected(Bundle bundle) {
-//        Log.i("CONNECTED", "I'm connected");
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 //        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            // Check Permissions Now
-//
 //            return;
 //        }
-//        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-//                mGoogleApiClient);
-//        if (mLastLocation != null) {
-//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-//            Log.i("Longitude", "");
-//            Log.i("Latitude", "");
-//    }
-
-//    @Override
-//    public void onConnectionSuspended(int i) {
 //
-//    }
-//
-//    @Override
-//    public void onConnectionFailed(ConnectionResult connectionResult) {
-//        Log.e("FAILED", connectionResult.toString());
-//    }
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 3, locationListener);
+        switch (requestCode) {
+            case 10:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    configureButton();
+                return;
+        }
+    }
 }

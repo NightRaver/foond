@@ -31,8 +31,6 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        Log.i("TEST", "getView() called at position " + position);
-
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.yelp_item, parent, false);
@@ -45,9 +43,7 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
         TextView restaurantAddress = (TextView) view.findViewById(R.id.restaurant_address);
         restaurantAddress.setText(yelpDetails.getAddress());
 
-        //Still need to do one for images
         ImageView restaurantImage = (ImageView) view.findViewById(R.id.restaurant_image);
-//        restaurantImage.setImageResource(yelpDetails.getPhotoId());
         yelpImage.with(this.context).load(yelpDetails.getRestaurantImage()).into(restaurantImage);
         return view;
     }
