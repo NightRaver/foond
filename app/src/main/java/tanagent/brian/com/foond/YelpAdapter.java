@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 /**
@@ -18,6 +20,7 @@ import java.util.List;
 public class YelpAdapter extends ArrayAdapter<YelpDetails> {
 
     private Context context;
+    private Picasso yelpImage;
     private List<YelpDetails> yelpDetailsList;
 
     public YelpAdapter(Context context, int resource, List<YelpDetails> objects) {
@@ -44,8 +47,8 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
 
         //Still need to do one for images
         ImageView restaurantImage = (ImageView) view.findViewById(R.id.restaurant_image);
-        restaurantImage.setImageResource(yelpDetails.getPhotoId());
-
+//        restaurantImage.setImageResource(yelpDetails.getPhotoId());
+        yelpImage.with(this.context).load(yelpDetails.getRestaurantImage()).into(restaurantImage);
         return view;
     }
 }

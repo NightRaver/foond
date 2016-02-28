@@ -29,10 +29,10 @@ public class Upload extends Activity{
 
     private static final int RESULT_LOAD_IMAGE = 1;
     private ImageView foodImage;
-    private Button submitButton, selectImageButton;
+    private Button submitButton, selectImageButton, selectRestaurant;
     private Firebase firebase;
 
-    private Button exampleButton;
+    private Button exampleButton; // for firebase
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +69,15 @@ public class Upload extends Activity{
         });
 
         foodImage = (ImageView) findViewById(R.id.selected_image);
+
+        selectRestaurant = (Button) findViewById(R.id.yelp_restaurants_btn);
+        selectRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent yelpIntent = new Intent(Upload.this, Yelp.class);
+                startActivity(yelpIntent);
+            }
+        });
 
         selectImageButton = (Button) findViewById(R.id.gallery_button);
         selectImageButton.setOnClickListener(new View.OnClickListener() {
