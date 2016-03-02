@@ -2,6 +2,7 @@ package tanagent.brian.com.foond;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -15,12 +16,20 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 /**
  * Created by Brian on 1/31/2016.
@@ -31,6 +40,7 @@ public class Upload extends Activity{
     private ImageView foodImage;
     private Button submitButton, selectImageButton, selectRestaurant;
     private Firebase firebase;
+    private File imageFile;
 
     private Button exampleButton; // for firebase
 
@@ -64,7 +74,7 @@ public class Upload extends Activity{
         exampleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                firebase.child("Pictures/").setValue("hey");
+                firebase.child("Pictures/").setValue("bye");
             }
         });
 
@@ -94,7 +104,41 @@ public class Upload extends Activity{
             @Override
             public void onClick(View v) {
                 Toast.makeText(Upload.this, "The photo has been uploaded", Toast.LENGTH_LONG).show();
+
+                new Thread() {
+                    @Override
+                    public void run() {
+//                        super.run();
+
+                        // Initialize the Amazon Cognito credentials provider
+                        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                                getApplicationContext(),
+                                "us-east-1:c32aa5d6-c50f-4195-8d9a-dc047a86707d", // Identity Pool ID
+                                Regions.US_EAST_1 // Region
+                        );
+
+
+                        // Instantiate an S3 Client
+                        // Create an S3 client
+                        AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
+
+                        // Set the region of your s3 bucket
+                        s3.setRegion(Region.getRegion(Regions.DEFAULT_REGION));
+
+                        // Instantiate TransferUtility
+                        TransferUtility transferUtility = new TransferUtility(s3, getApplicationContext());
+
+                        //Upload a file to amazon s3
+
+                        TransferObserver observer = transferUtility.upload(
+                                "/foond",     /* The bucket to upload to */
+                                "key",    /* The key for the uploaded object */
+                                imageFile        /* The file where the data to upload exists */
+                        );
+                    }
+                }.start();
             }
+
         });
     }
 
@@ -104,31 +148,21 @@ public class Upload extends Activity{
         if(requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
             Uri selectedImage = data.getData();
             foodImage.setImageURI(selectedImage);
+            imageFile = new File(getRealPathFromURI(selectedImage));
         }
     }
 
-    // Convert image to Base64 string and push to firebase
-    public static String encodeTobase64(Bitmap image) {
-        Bitmap immagex=image;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        immagex.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] b = baos.toByteArray();
-        String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
-
-        Log.e("LOOK", imageEncoded);
-        return imageEncoded;
-    }
-
-    // to decode the image
-    public static Bitmap decodeBase64(String input) {
-        byte[] decodedByte = Base64.decode(input, 0);
-        return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
-    }
-
-    // converts imageview to bitmap
-    public static Bitmap convertToBitmap(ImageView imageView) {
-        imageView.buildDrawingCache();
-        Bitmap bmap = imageView.getDrawingCache();
-        return bmap;
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
     }
 }

@@ -178,9 +178,10 @@ public class Yelp extends Activity {
             e.printStackTrace();
         }
 
+        Log.i("address", address);
         Log.i("City", city);
         Log.i("State", state);
-        Call<SearchResponse> call = yelpAPI.search(city + ", " + state, params);
+        Call<SearchResponse> call = yelpAPI.search(address + ", " + city + ", " + state, params);
 
         // Pass in a Callback object to send request asynchronously
         Callback<SearchResponse> callback = new Callback<SearchResponse>() {
@@ -222,57 +223,57 @@ public class Yelp extends Activity {
         Assert.assertNotNull(searchResponse);
     }
 
-    @Test
-    public void testSearchByLocationWithOptionalCoordinate() throws IOException {
-        Map<String, String> params = new HashMap<>();
-        params.put("term", "yelp");
-        params.put("cll", "37.7867703362929,-122.399958372115");
-
-        Call<SearchResponse> call = yelpAPI.search("San Francisco", params);
-        Response<SearchResponse> response = call.execute();
-        Assert.assertEquals(200, response.code());
-
-        SearchResponse searchResponse = response.body();
-        Assert.assertNotNull(searchResponse);
-    }
-
-
-    @Test
-    public void testSearchByCoordinateOptions() throws IOException {
-        CoordinateOptions coordinate = CoordinateOptions.builder()
-                .latitude(37.7867703362929)
-                .longitude(-122.399958372115).build();
-
-        Map<String, String> params = new HashMap<>();
-        params.put("term", "yelp");
-
-        Call<SearchResponse> call = yelpAPI.search(coordinate, params);
-        Response<SearchResponse> response = call.execute();
-        Assert.assertEquals(200, response.code());
-
-        SearchResponse searchResponse = response.body();
-        Assert.assertNotNull(searchResponse);
-    }
-
-    @Test
-    public void testSearchByBoundingBoxOptions() throws IOException {
-        BoundingBoxOptions bounds = BoundingBoxOptions.builder()
-                .swLatitude(37.900000)
-                .swLongitude(-122.500000)
-                .neLatitude(37.788022)
-                .neLongitude(-122.399797)
-                .build();
-
-        Map<String, String> params = new HashMap<>();
-        params.put("term", "yelp");
-
-        Call<SearchResponse> call = yelpAPI.search(bounds, params);
-        Response<SearchResponse> response = call.execute();
-        Assert.assertEquals(200, response.code());
-
-        SearchResponse searchResponse = response.body();
-        Assert.assertNotNull(searchResponse);
-    }
+//    @Test
+//    public void testSearchByLocationWithOptionalCoordinate() throws IOException {
+//        Map<String, String> params = new HashMap<>();
+//        params.put("term", "yelp");
+//        params.put("cll", "37.7867703362929,-122.399958372115");
+//
+//        Call<SearchResponse> call = yelpAPI.search("San Francisco", params);
+//        Response<SearchResponse> response = call.execute();
+//        Assert.assertEquals(200, response.code());
+//
+//        SearchResponse searchResponse = response.body();
+//        Assert.assertNotNull(searchResponse);
+//    }
+//
+//
+//    @Test
+//    public void testSearchByCoordinateOptions() throws IOException {
+//        CoordinateOptions coordinate = CoordinateOptions.builder()
+//                .latitude(37.7867703362929)
+//                .longitude(-122.399958372115).build();
+//
+//        Map<String, String> params = new HashMap<>();
+//        params.put("term", "yelp");
+//
+//        Call<SearchResponse> call = yelpAPI.search(coordinate, params);
+//        Response<SearchResponse> response = call.execute();
+//        Assert.assertEquals(200, response.code());
+//
+//        SearchResponse searchResponse = response.body();
+//        Assert.assertNotNull(searchResponse);
+//    }
+//
+//    @Test
+//    public void testSearchByBoundingBoxOptions() throws IOException {
+//        BoundingBoxOptions bounds = BoundingBoxOptions.builder()
+//                .swLatitude(37.900000)
+//                .swLongitude(-122.500000)
+//                .neLatitude(37.788022)
+//                .neLongitude(-122.399797)
+//                .build();
+//
+//        Map<String, String> params = new HashMap<>();
+//        params.put("term", "yelp");
+//
+//        Call<SearchResponse> call = yelpAPI.search(bounds, params);
+//        Response<SearchResponse> response = call.execute();
+//        Assert.assertEquals(200, response.code());
+//
+//        SearchResponse searchResponse = response.body();
+//        Assert.assertNotNull(searchResponse);
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
