@@ -1,11 +1,14 @@
 package tanagent.brian.com.foond;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,19 +27,15 @@ public class ImageAdapter extends BaseAdapter {
     public ImageAdapter(Context context) {
         inflater = LayoutInflater.from(context);
 
-        foods.add(new Food(R.drawable.sample_0));
-        foods.add(new Food(R.drawable.sample_1));
-        foods.add(new Food(R.drawable.sample_2));
-        foods.add(new Food(R.drawable.sample_3));
-        foods.add(new Food(R.drawable.sample_4));
-        foods.add(new Food(R.drawable.sample_5));
-        foods.add(new Food(R.drawable.sample_6));
-        foods.add(new Food(R.drawable.sample_7));
-        foods.add(new Food(R.drawable.sample_2));
-        foods.add(new Food(R.drawable.sample_4));
-        foods.add(new Food(R.drawable.sample_6));
-        foods.add(new Food(R.drawable.sample_5));
-
+        foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food0.jpg"));
+        foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food1.jpg"));
+        foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food2.jpg"));
+        foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food3.jpg"));
+        foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food4.jpg"));
+        foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food5.jpg"));
+        foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food6.jpg"));
+        foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food7.jpg"));
+        foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food8.jpg"));
     }
 
     @Override
@@ -51,33 +50,44 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return foods.get(position).foodId;
+        return 0;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
-        ImageView picture;
+        ImageView imageView;
 
         if(view == null) {
             view = inflater.inflate(R.layout.gridview_item, parent, false);
             view.setTag(R.id.picture, view.findViewById(R.id.picture));
         }
 
-        picture = (ImageView) view.getTag(R.id.picture);
+        imageView = (ImageView) view.getTag(R.id.picture);
 
         Food food = (Food) getItem(position);
 
-        picture.setImageResource(food.foodId);
+        final String imageUrl = food.foodId;
+
+        Picasso.with(view.getContext()).load(imageUrl).into(imageView);
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), Select.class);
+                intent.putExtra("url", imageUrl);
+                v.getContext().startActivity(intent);
+            }
+        });
 
         return view;
     }
 
 
     private class Food {
-        final int foodId;
+        final String foodId;
 
-        Food(int foodId) {
+        Food(String foodId) {
             this.foodId = foodId;
         }
     }

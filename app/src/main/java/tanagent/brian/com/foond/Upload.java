@@ -1,46 +1,80 @@
 package tanagent.brian.com.foond;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.iterable.S3Objects;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Brian on 1/31/2016.
  */
 public class Upload extends Activity{
 
+    private CognitoCachingCredentialsProvider credentialsProvider;
+    private AmazonS3 s3;
+    // The TransferUtility is the primary class for managing transfer to S3
+    private TransferUtility transferUtility;
+    private TransferObserver observer;
+
     private static final int RESULT_LOAD_IMAGE = 1;
+    private static final String TAG = "UploadActivity";
     private ImageView foodImage;
     private Button submitButton, selectImageButton, selectRestaurant;
     private Firebase firebase;
     private File imageFile;
+
+
 
     private Button exampleButton; // for firebase
 
@@ -48,35 +82,12 @@ public class Upload extends Activity{
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.upload);
 
-        // initialize Firebase
-        firebase.setAndroidContext(this);
-        firebase = new Firebase("https://amber-heat-9533.firebaseio.com/");
-        firebase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-//                String example = (String) dataSnapshot.getValue();
-            }
+        transferUtility = Util.getTransferUtility(this);
 
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
-
-
-//        // Converting to Bitmap
-//        Bitmap bitFood = convertToBitmap(foodImage);
-//
-//        // Converting it to Base64
-//        String baseFood = encodeTobase64(bitFood);
-
-        exampleButton = (Button) findViewById(R.id.example);
-        exampleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                firebase.child("Pictures/").setValue("bye");
-            }
-        });
+//        this works!!
+//        Picasso food = null;
+//        foodImage = (ImageView) findViewById(R.id.selected_image);
+//        food.with(this).load("https://s3.amazonaws.com/foond/food.jpg").into(foodImage);
 
         foodImage = (ImageView) findViewById(R.id.selected_image);
 
@@ -105,40 +116,94 @@ public class Upload extends Activity{
             public void onClick(View v) {
                 Toast.makeText(Upload.this, "The photo has been uploaded", Toast.LENGTH_LONG).show();
 
-                new Thread() {
-                    @Override
-                    public void run() {
-//                        super.run();
+                AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
 
-                        // Initialize the Amazon Cognito credentials provider
-                        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        credentialsProvider = new CognitoCachingCredentialsProvider(
                                 getApplicationContext(),
                                 "us-east-1:c32aa5d6-c50f-4195-8d9a-dc047a86707d", // Identity Pool ID
                                 Regions.US_EAST_1 // Region
                         );
 
+                        AWSCredentialsProvider provider = new AWSCredentialsProvider() {
+                            @Override
+                            public AWSCredentials getCredentials() {
+
+                                return
+                                        new BasicAWSCredentials("AKIAJJG7CC6DC2A7P4OQ","aGEzy0zaBRwyUKjpnyggflxWCq1XE6qi7Ewphvoc");
+                            }
+
+                            @Override
+                            public void refresh() {
+
+                            }
+                        };
 
                         // Instantiate an S3 Client
                         // Create an S3 client
-                        AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
+                        s3 = new AmazonS3Client(credentialsProvider);
 
                         // Set the region of your s3 bucket
                         s3.setRegion(Region.getRegion(Regions.DEFAULT_REGION));
 
                         // Instantiate TransferUtility
-                        TransferUtility transferUtility = new TransferUtility(s3, getApplicationContext());
+                        transferUtility = new TransferUtility(s3, getApplicationContext());
 
                         //Upload a file to amazon s3
+                        Log.i("imageFile", imageFile.toString());
 
-                        TransferObserver observer = transferUtility.upload(
-                                "/foond",     /* The bucket to upload to */
+                        observer = transferUtility.upload(
+                                "foond",     /* The bucket to upload to */
                                 "key",    /* The key for the uploaded object */
                                 imageFile        /* The file where the data to upload exists */
                         );
-                    }
-                }.start();
-            }
 
+                        Log.i("observer", observer.getAbsoluteFilePath());
+                        Log.i("observer", observer.toString());
+                        Log.i("observer", observer.getState().toString());
+                        Log.i("observer", String.valueOf(observer.getBytesTransferred()));
+
+                        observer.setTransferListener(new TransferListener() {
+                            @Override
+                            public void onStateChanged(int id, TransferState state) {
+                                Log.i("id", String.valueOf(id));
+                                Log.i("TransferState", String.valueOf(state));
+                            }
+
+                            @Override
+                            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                                Log.i("id", String.valueOf(id));
+                                Log.i("bytesCurrent", String.valueOf(bytesCurrent));
+                                Log.i("bytesTotal", String.valueOf(bytesTotal));
+                            }
+
+                            @Override
+                            public void onError(int id, Exception ex) {
+                                Log.e("Error", String.valueOf(ex));
+                            }
+                        });
+
+                        Log.i("observer", observer.getState().toString());
+                        Log.i("observer", String.valueOf(observer.getBytesTransferred()));
+//                        for(S3ObjectSummary summary : S3Objects.withPrefix(s3, "foond", "food/")) {
+//                            Log.i("Object with key", summary.getKey());
+//                        }
+
+                        try {
+                            PutObjectRequest putObjectRequest = new PutObjectRequest("foond", "test.jpg", imageFile);
+                            s3.putObject(putObjectRequest);
+                        } catch (Exception e) {
+                            Log.e("TEST", e.getMessage(), e);
+                        }
+
+
+                        return null;
+                    }
+                };
+
+                task.execute();
+            }
         });
     }
 
@@ -148,8 +213,43 @@ public class Upload extends Activity{
         if(requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
             Uri selectedImage = data.getData();
             foodImage.setImageURI(selectedImage);
-            imageFile = new File(getRealPathFromURI(selectedImage));
+            Drawable mDrawable = foodImage.getDrawable();
+            Bitmap mBitmap = drawableToBitmap(mDrawable);
+//            imageFile = new File(getRealPathFromURI(selectedImage));
+
+            imageFile = new File(getFilesDir(),"test");
+            if(imageFile.exists())imageFile.delete();
+            try {
+                imageFile.createNewFile();
+                FileOutputStream out = new FileOutputStream(imageFile);
+                mBitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        Bitmap bitmap = null;
+
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            if(bitmapDrawable.getBitmap() != null) {
+                return bitmapDrawable.getBitmap();
+            }
+        }
+
+        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
+        } else {
+            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
     }
 
     private String getRealPathFromURI(Uri contentURI) {

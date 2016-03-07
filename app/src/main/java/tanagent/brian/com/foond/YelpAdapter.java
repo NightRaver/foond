@@ -41,7 +41,10 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
         restaurantName.setText(yelpDetails.getRestaurantName());
 
         TextView restaurantAddress = (TextView) view.findViewById(R.id.restaurant_address);
-        restaurantAddress.setText(yelpDetails.getAddress());
+        restaurantAddress.setText(yelpDetails.getRestaurantAddress());
+
+        TextView restaurantCity = (TextView) view.findViewById(R.id.restaurant_city);
+        restaurantCity.setText(yelpDetails.getRestaurantCity());
 
         ImageView restaurantImage = (ImageView) view.findViewById(R.id.restaurant_image);
         yelpImage.with(this.context).load(yelpDetails.getRestaurantImage()).into(restaurantImage);

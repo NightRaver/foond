@@ -8,8 +8,4 @@
     android:horizontalSpacing="10dp"
     android:verticalSpacing="10dp">
 
-
-
-
-
 </GridView>

@@ -5,9 +5,9 @@ package tanagent.brian.com.foond;
  */
 public class Food {
 
-    final int foodId;
+    final String foodId;
 
-    Food(int foodId) {
+    Food(String foodId) {
         this.foodId = foodId;
     }
 }

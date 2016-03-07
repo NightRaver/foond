@@ -37,6 +37,12 @@
             android:layout_height="wrap_content"
             android:text="address"/>
 
+        <TextView
+            android:id="@+id/restaurant_city"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="city"/>
+
     </LinearLayout>
 
 

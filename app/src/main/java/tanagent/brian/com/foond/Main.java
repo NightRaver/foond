@@ -25,18 +25,6 @@ public class Main extends AppCompatActivity {
         // Calls the grid view.
         gridView = (GridView) findViewById(R.id.grid_view);
         gridView.setAdapter(new ImageAdapter(this));
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(Main.this, Select.class);
-                Log.i("TAG", "Hard code: " + R.drawable.sample_0);
-                Log.i("TAG", "Position: " + position);
-                Log.i("TAG", "ID: " + id);
-                intent.putExtra("foodId", (int) id);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -53,6 +41,11 @@ public class Main extends AppCompatActivity {
                 Intent upload = new Intent(this, Upload.class);
                 startActivity(upload);
                 break;
+
+            // Uncomment this to add features
+            // Remember to uncomment the codes in menu.xml
+
+            /*
             case R.id.distance:
                 Intent distance = new Intent(this, Distance.class);
                 startActivity(distance);
@@ -61,6 +54,7 @@ public class Main extends AppCompatActivity {
                 Intent account = new Intent(this, Account.class);
                 startActivity(account);
                 break;
+             */
         }
 
         return super.onOptionsItemSelected(item);

@@ -63,19 +63,18 @@ public class Yelp extends Activity {
     private String restaurantName;
     private String restaurantAddress;
     private String restaurantImage;
+    private String restaurantCity;
 
     private List<YelpDetails> yelpList = new ArrayList<YelpDetails>();
 
     private ListView listView;
     private YelpAdapter yelpAdapter;
 
-    private Location lastLocation;
     private LocationManager locationManager;
     private LocationListener locationListener;
 
     private double latitude;
     private double longitude;
-    private String currentLocation;
 
     private String address;
     private String city;
@@ -119,8 +118,11 @@ public class Yelp extends Activity {
             }
         };
 
-//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
             // Requested permissions for ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, AND INTERNET
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{
@@ -128,7 +130,9 @@ public class Yelp extends Activity {
                         Manifest.permission.INTERNET
                 }, 10);
             }
+
             return;
+
         } else {
             configureButton();
         }
@@ -165,9 +169,10 @@ public class Yelp extends Activity {
         List<Address> addresses;
         geocoder = new Geocoder(this, Locale.getDefault());
 
+        // translates latitude and longitude to an address
         try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            address = addresses.get(0).getAddressLine(0);
             city = addresses.get(0).getLocality();
             state = addresses.get(0).getAdminArea();
             country = addresses.get(0).getCountryName();
@@ -178,9 +183,6 @@ public class Yelp extends Activity {
             e.printStackTrace();
         }
 
-        Log.i("address", address);
-        Log.i("City", city);
-        Log.i("State", state);
         Call<SearchResponse> call = yelpAPI.search(address + ", " + city + ", " + state, params);
 
         // Pass in a Callback object to send request asynchronously
@@ -191,10 +193,13 @@ public class Yelp extends Activity {
 
                 for (int i = 0; i < numOfBusinesses; i++) {
                     restaurantName = searchResponse.businesses().get(i).name();
-                    restaurantAddress = searchResponse.businesses().get(i).location().postalCode();
+                    restaurantAddress = searchResponse.businesses().get(i).location().displayAddress().get(0);
+                    restaurantCity = searchResponse.businesses().get(i).location().city()
+                            + " " + searchResponse.businesses().get(i).location().postalCode();
                     restaurantImage = searchResponse.businesses().get(i).imageUrl();
 
-                    yelpList.add(new YelpDetails(restaurantImage, restaurantName, restaurantAddress));
+                    yelpList.add(new YelpDetails(restaurantImage, restaurantName,
+                            restaurantAddress, restaurantCity));
                 }
 
                 listView = (ListView) findViewById(R.id.yelp_results);
@@ -223,66 +228,8 @@ public class Yelp extends Activity {
         Assert.assertNotNull(searchResponse);
     }
 
-//    @Test
-//    public void testSearchByLocationWithOptionalCoordinate() throws IOException {
-//        Map<String, String> params = new HashMap<>();
-//        params.put("term", "yelp");
-//        params.put("cll", "37.7867703362929,-122.399958372115");
-//
-//        Call<SearchResponse> call = yelpAPI.search("San Francisco", params);
-//        Response<SearchResponse> response = call.execute();
-//        Assert.assertEquals(200, response.code());
-//
-//        SearchResponse searchResponse = response.body();
-//        Assert.assertNotNull(searchResponse);
-//    }
-//
-//
-//    @Test
-//    public void testSearchByCoordinateOptions() throws IOException {
-//        CoordinateOptions coordinate = CoordinateOptions.builder()
-//                .latitude(37.7867703362929)
-//                .longitude(-122.399958372115).build();
-//
-//        Map<String, String> params = new HashMap<>();
-//        params.put("term", "yelp");
-//
-//        Call<SearchResponse> call = yelpAPI.search(coordinate, params);
-//        Response<SearchResponse> response = call.execute();
-//        Assert.assertEquals(200, response.code());
-//
-//        SearchResponse searchResponse = response.body();
-//        Assert.assertNotNull(searchResponse);
-//    }
-//
-//    @Test
-//    public void testSearchByBoundingBoxOptions() throws IOException {
-//        BoundingBoxOptions bounds = BoundingBoxOptions.builder()
-//                .swLatitude(37.900000)
-//                .swLongitude(-122.500000)
-//                .neLatitude(37.788022)
-//                .neLongitude(-122.399797)
-//                .build();
-//
-//        Map<String, String> params = new HashMap<>();
-//        params.put("term", "yelp");
-//
-//        Call<SearchResponse> call = yelpAPI.search(bounds, params);
-//        Response<SearchResponse> response = call.execute();
-//        Assert.assertEquals(200, response.code());
-//
-//        SearchResponse searchResponse = response.body();
-//        Assert.assertNotNull(searchResponse);
-//    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//
-//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 3, locationListener);
         switch (requestCode) {
             case 10:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)

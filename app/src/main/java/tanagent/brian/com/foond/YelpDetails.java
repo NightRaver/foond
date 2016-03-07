@@ -8,24 +8,18 @@ import java.net.URL;
  */
 public class YelpDetails {
 
-//    private int photoId;
     private String restaurantImage;
     private String restaurantName;
-    private String address;
+    private String restaurantAddress;
+    private String restaurantCity;
 
-    public YelpDetails(String restaurantImage, String restaurantName, String address) {
+    public YelpDetails(String restaurantImage, String restaurantName,
+                       String restaurantAddress, String restaurantCity) {
         this.restaurantImage = restaurantImage;
         this.restaurantName = restaurantName;
-        this.address = address;
+        this.restaurantAddress = restaurantAddress;
+        this.restaurantCity = restaurantCity;
     }
-
-//    public int getPhotoId() {
-//        return photoId;
-//    }
-//
-//    public void setPhotoId(int photoId) {
-//        this.photoId = photoId;
-//    }
 
     public String getRestaurantImage() {
         return restaurantImage;
@@ -43,11 +37,19 @@ public class YelpDetails {
         this.restaurantName = restaurantName;
     }
 
-    public String getAddress() {
-        return address;
+    public String getRestaurantAddress() {
+        return restaurantAddress;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setRestaurantAddress(String address) {
+        this.restaurantAddress = restaurantAddress;
+    }
+
+    public String getRestaurantCity() {
+        return restaurantCity;
+    }
+
+    public void setRestaurantCity(String restaurantCity) {
+        this.restaurantCity = restaurantCity;
     }
 }

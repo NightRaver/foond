@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
 /**
  * Created by Brian on 1/31/2016.
  */
@@ -19,7 +21,7 @@ public class Select extends Activity{
         this.setContentView(R.layout.select);
 
         foodImage = (ImageView) findViewById(R.id.food_image);
-        foodImage.setImageResource(getIntent().getExtras().getInt("foodId"));
+        Picasso.with(this).load(getIntent().getExtras().getString("url")).into(foodImage);
 
         starButton = (ImageView) findViewById(R.id.star_button);
         starButton.setOnClickListener(new View.OnClickListener() {

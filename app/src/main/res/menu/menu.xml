@@ -3,16 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_item_new_crime"
-        android:icon="@android:drawable/ic_menu_add"
-        android:title="@string/new_crime"
-        app:showAsAction="ifRoom|withText" />
-
-    <item
         android:id="@+id/upload"
         android:title="Upload a picture"
-        android:showAsAction="never" />
+        android:showAsAction="" />
 
+    <!--Uncomment these to add these items-->
+    <!--Remember to comment the code in Main.java-->
+
+    <!--
     <item
         android:id="@+id/distance"
         android:title="Distance"
@@ -22,5 +20,5 @@
         android:id="@+id/account"
         android:title="Account"
         android:showAsAction="never" />
-
+    -->
 </menu>
