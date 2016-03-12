@@ -126,20 +126,6 @@ public class Upload extends Activity{
                                 Regions.US_EAST_1 // Region
                         );
 
-                        AWSCredentialsProvider provider = new AWSCredentialsProvider() {
-                            @Override
-                            public AWSCredentials getCredentials() {
-
-                                return
-                                        new BasicAWSCredentials("AKIAJJG7CC6DC2A7P4OQ","aGEzy0zaBRwyUKjpnyggflxWCq1XE6qi7Ewphvoc");
-                            }
-
-                            @Override
-                            public void refresh() {
-
-                            }
-                        };
-
                         // Instantiate an S3 Client
                         // Create an S3 client
                         s3 = new AmazonS3Client(credentialsProvider);
@@ -180,7 +166,7 @@ public class Upload extends Activity{
 
                             @Override
                             public void onError(int id, Exception ex) {
-                                Log.e("Error", String.valueOf(ex));
+                                Log.e("Error1", String.valueOf(ex));
                             }
                         });
 
@@ -190,12 +176,12 @@ public class Upload extends Activity{
 //                            Log.i("Object with key", summary.getKey());
 //                        }
 
-                        try {
-                            PutObjectRequest putObjectRequest = new PutObjectRequest("foond", "test.jpg", imageFile);
-                            s3.putObject(putObjectRequest);
-                        } catch (Exception e) {
-                            Log.e("TEST", e.getMessage(), e);
-                        }
+//                        try {
+//                            PutObjectRequest putObjectRequest = new PutObjectRequest("foond", "test.jpg", imageFile);
+//                            s3.putObject(putObjectRequest);
+//                        } catch (Exception e) {
+//                            Log.e("TEST", e.getMessage(), e);
+//                        }
 
 
                         return null;
