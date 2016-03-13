@@ -104,7 +104,19 @@ public class Upload extends Activity{
         selectImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent galleryIntent = new Intent();
+                if (Build.VERSION.SDK_INT >= 19) {
+                    // For Android versions of KitKat or later, we use a
+                    // different intent to ensure
+                    // we can get the file path from the returned intent URI
+                    galleryIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                    galleryIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                    galleryIntent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                } else {
+                    galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                }
+
+                galleryIntent.setType("image/*");
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMAGE);
             }
         });
