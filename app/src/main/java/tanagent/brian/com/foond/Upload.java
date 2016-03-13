@@ -122,7 +122,7 @@ public class Upload extends Activity{
                     protected Void doInBackground(Void... params) {
                         credentialsProvider = new CognitoCachingCredentialsProvider(
                                 getApplicationContext(),
-                                "us-east-1:c32aa5d6-c50f-4195-8d9a-dc047a86707d", // Identity Pool ID
+                                "us-east-1:ac620376-ff60-4580-b750-17bd70ef228d", // Identity Pool ID
                                 Regions.US_EAST_1 // Region
                         );
 
@@ -131,7 +131,7 @@ public class Upload extends Activity{
                         s3 = new AmazonS3Client(credentialsProvider);
 
                         // Set the region of your s3 bucket
-                        s3.setRegion(Region.getRegion(Regions.DEFAULT_REGION));
+                        s3.setRegion(Region.getRegion(Regions.US_EAST_1));
 
                         // Instantiate TransferUtility
                         transferUtility = new TransferUtility(s3, getApplicationContext());
