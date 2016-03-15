@@ -36,6 +36,8 @@ public class ImageAdapter extends BaseAdapter {
         foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food6.jpg"));
         foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food7.jpg"));
         foods.add(new Food("https://s3.amazonaws.com/foond/food+examples/food8.jpg"));
+
+
     }
 
     @Override

@@ -1,6 +1,8 @@
 package tanagent.brian.com.foond;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,12 +13,27 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Created by Brian on 1/30/2016.
  */
 public class Main extends AppCompatActivity {
 
     private GridView gridView;
+    private AmazonS3 s3;
+    private List<S3ObjectSummary> s3ObjList;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +42,8 @@ public class Main extends AppCompatActivity {
         // Calls the grid view.
         gridView = (GridView) findViewById(R.id.grid_view);
         gridView.setAdapter(new ImageAdapter(this));
+
+        new GetFileListTask(getApplicationContext()).execute();
     }
 
     @Override
