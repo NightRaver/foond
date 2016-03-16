@@ -41,9 +41,9 @@ public class Main extends AppCompatActivity {
 
         // Calls the grid view.
         gridView = (GridView) findViewById(R.id.grid_view);
-        gridView.setAdapter(new ImageAdapter(this));
+        gridView.setAdapter(new ImageAdapter(this, getApplicationContext()));
 
-        new GetFileListTask(getApplicationContext()).execute();
+
     }
 
     @Override
