@@ -21,7 +21,7 @@ public class Constants {
      * You should replace these values with your own. See the README for details
      * on what to fill in.
      */
-    public static final String COGNITO_POOL_ID = "us-east-1:c32aa5d6-c50f-4195-8d9a-dc047a86707d";
+    public static final String COGNITO_POOL_ID = "us-east-1:ac620376-ff60-4580-b750-17bd70ef228d";
 
     /*
      * Note, you must first create a bucket using the S3 console before running

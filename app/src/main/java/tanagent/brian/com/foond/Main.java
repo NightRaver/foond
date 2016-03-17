@@ -1,29 +1,22 @@
 package tanagent.brian.com.foond;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,18 +25,49 @@ import java.util.List;
 public class Main extends AppCompatActivity {
 
     private GridView gridView;
-    private AmazonS3 s3;
     private List<S3ObjectSummary> s3ObjList;
+    private CognitoCachingCredentialsProvider credentialsProvider;
+    private AmazonS3 s3;
+    private List<Food> foods = new ArrayList<Food>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.main);
 
-        // Calls the grid view.
-        gridView = (GridView) findViewById(R.id.grid_view);
-        gridView.setAdapter(new ImageAdapter(this, getApplicationContext()));
+        AsyncTask<Void, Void, List<Food>> task = new AsyncTask<Void, Void, List<Food>>() {
+            @Override
+            protected List<Food> doInBackground(Void... params) {
+                credentialsProvider = new CognitoCachingCredentialsProvider(
+                        getApplicationContext(),
+                        Constants.COGNITO_POOL_ID, // Identity Pool ID
+                        Regions.US_EAST_1 // Region
+                );
 
+                // Instantiate an S3 Client
+                // Create an S3 client
+                s3 = new AmazonS3Client(credentialsProvider);
 
+                // Set the region of your s3 bucket
+                s3.setRegion(Region.getRegion(Regions.US_EAST_1));
+
+                s3ObjList = s3.listObjects(Constants.BUCKET_NAME).getObjectSummaries();
+
+                for (S3ObjectSummary summary : s3ObjList) {
+                    foods.add(new Food("https://s3.amazonaws.com/" + summary.getBucketName() + "/" + summary.getKey()));
+                }
+
+                return foods;
+            }
+
+            @Override
+            protected void onPostExecute(List<Food> foods) {
+                // Calls the grid view.
+                gridView = (GridView) findViewById(R.id.grid_view);
+                gridView.setAdapter(new ImageAdapter(Main.this, foods));
+            }
+        };
+
+        task.execute();
     }
 
     @Override

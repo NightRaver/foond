@@ -115,7 +115,7 @@ public class Upload extends Activity{
                         protected Void doInBackground(Void... params) {
                             credentialsProvider = new CognitoCachingCredentialsProvider(
                                     getApplicationContext(),
-                                    "us-east-1:ac620376-ff60-4580-b750-17bd70ef228d", // Identity Pool ID
+                                    Constants.COGNITO_POOL_ID, // Identity Pool ID
                                     Regions.US_EAST_1 // Region
                             );
 
