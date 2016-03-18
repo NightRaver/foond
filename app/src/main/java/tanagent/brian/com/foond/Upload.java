@@ -56,6 +56,7 @@ public class Upload extends Activity{
     private static final String TAG = "Upload";
     private ImageView foodImage;
     private Button submitButton, selectImageButton, selectRestaurant;
+    private ProgressBar progressBar;
     private Firebase firebase;
     private File imageFile;
 
@@ -109,7 +110,7 @@ public class Upload extends Activity{
 
 
                 } else {
-                    AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                    AsyncTask<Void, Integer, Void> task = new AsyncTask<Void, Integer, Void>() {
 
                         @Override
                         protected Void doInBackground(Void... params) {
@@ -133,15 +134,17 @@ public class Upload extends Activity{
                             Log.i("imageFile", imageFile.toString());
 
                             observer = transferUtility.upload(
-                                    "foond",     /* The bucket to upload to */
-                                    imageFile.getName(),    /* The key for the uploaded object */
-                                    imageFile        /* The file where the data to upload exists */
+                                    Constants.BUCKET_NAME,     /* The bucket to upload to */
+                                    imageFile.getName(),       /* The key for the uploaded object */
+                                    imageFile                  /* The file where the data to upload exists */
                             );
 
                             Log.i("observer", observer.getAbsoluteFilePath());
                             Log.i("observer", observer.toString());
                             Log.i("observer", observer.getState().toString());
                             Log.i("observer", String.valueOf(observer.getBytesTransferred()));
+
+                            progressBar = (ProgressBar) findViewById(R.id.progressBar1);
 
                             observer.setTransferListener(new TransferListener() {
                                 @Override
@@ -154,9 +157,12 @@ public class Upload extends Activity{
 
                                 @Override
                                 public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                                    progressBar.setMax((int) bytesTotal);
                                     Log.i("id", String.valueOf(id));
                                     Log.i("bytesCurrent", String.valueOf(bytesCurrent));
                                     Log.i("bytesTotal", String.valueOf(bytesTotal));
+                                    Integer current = new Integer((int) bytesCurrent);
+                                    publishProgress(current);
                                 }
 
                                 @Override
@@ -169,6 +175,13 @@ public class Upload extends Activity{
                             Log.i("observer", String.valueOf(observer.getBytesTransferred()));
 
                             return null;
+                        }
+
+                        @Override
+                        protected void onProgressUpdate(Integer... values) {
+//                            super.onProgressUpdate(values);
+                            int progress = values[0];
+                            progressBar.setProgress(progress);
                         }
                     };
                     task.execute();
@@ -184,11 +197,10 @@ public class Upload extends Activity{
             Uri selectedImage = data.getData();
             foodImage.setImageURI(selectedImage);
 
-
             Drawable mDrawable = foodImage.getDrawable();
             Bitmap mBitmap = drawableToBitmap(mDrawable);
 
-            imageFile = new File(getFilesDir(), "asdf.jpg");
+            imageFile = new File(getFilesDir(), "example" + ".jpg");
             if(imageFile.exists())
                 imageFile.delete();
             try {
