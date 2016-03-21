@@ -5,6 +5,20 @@
     android:layout_height="match_parent"
     android:background="#ef9e68">
 
+    <TextView
+        android:id="@+id/restaurant_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Restaurant Name"
+        android:gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/restaurant_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Address"
+        android:gravity="center_horizontal"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,14 +58,6 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:text="Select Image From Gallery"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Name of Food:"
-        android:layout_weight="0"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"/>
 
     <Button
         android:id="@+id/submit"

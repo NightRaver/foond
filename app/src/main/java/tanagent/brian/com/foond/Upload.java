@@ -1,12 +1,9 @@
 package tanagent.brian.com.foond;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -14,14 +11,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -33,13 +29,18 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.firebase.client.Firebase;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import tanagent.brian.com.foond.Yelp.Yelp;
 
 /**
  * Created by Brian on 1/31/2016.
@@ -57,6 +58,7 @@ public class Upload extends Activity{
     private ImageView foodImage;
     private Button submitButton, selectImageButton, selectRestaurant;
     private ProgressBar progressBar;
+    private TextView restaurantName, restaurantAddress;
     private Firebase firebase;
     private File imageFile;
 
@@ -64,7 +66,18 @@ public class Upload extends Activity{
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        requestWindowFeature(Window.FEATURE_PROGRESS);
         this.setContentView(R.layout.upload);
+
+        restaurantName = (TextView) findViewById(R.id.restaurant_name);
+        restaurantAddress = (TextView) findViewById(R.id.restaurant_address);
+
+        Intent intent = getIntent();
+
+        if(intent.hasExtra("restaurantName") && intent.hasExtra("restaurantAddress")) {
+            restaurantName.setText(intent.getExtras().getString("restaurantName"));
+            restaurantAddress.setText(intent.getExtras().getString("restaurantAddress"));
+        }
 
         transferUtility = Util.getTransferUtility(this);
 
@@ -130,19 +143,21 @@ public class Upload extends Activity{
                             // Instantiate TransferUtility
                             transferUtility = new TransferUtility(s3, getApplicationContext());
 
-                            //Upload a file to amazon s3
-                            Log.i("imageFile", imageFile.toString());
+                            ObjectMetadata myObjectMetadata = new ObjectMetadata();
+
+                            //create a map to store user metadata
+                            Map<String, String> userMetadata = new HashMap<String,String>();
+                            userMetadata.put("MyKey","MyVal");
+
+                            //call setUserMetadata on our ObjectMetadata object, passing it our map
+                            myObjectMetadata.setUserMetadata(userMetadata);
 
                             observer = transferUtility.upload(
                                     Constants.BUCKET_NAME,     /* The bucket to upload to */
                                     imageFile.getName(),       /* The key for the uploaded object */
-                                    imageFile                  /* The file where the data to upload exists */
+                                    imageFile,                  /* The file where the data to upload exists */
+                                    myObjectMetadata
                             );
-
-                            Log.i("observer", observer.getAbsoluteFilePath());
-                            Log.i("observer", observer.toString());
-                            Log.i("observer", observer.getState().toString());
-                            Log.i("observer", String.valueOf(observer.getBytesTransferred()));
 
                             progressBar = (ProgressBar) findViewById(R.id.progressBar1);
 
@@ -179,7 +194,6 @@ public class Upload extends Activity{
 
                         @Override
                         protected void onProgressUpdate(Integer... values) {
-//                            super.onProgressUpdate(values);
                             int progress = values[0];
                             progressBar.setProgress(progress);
                         }
@@ -201,8 +215,10 @@ public class Upload extends Activity{
             Bitmap mBitmap = drawableToBitmap(mDrawable);
 
             imageFile = new File(getFilesDir(), "example" + ".jpg");
+
             if(imageFile.exists())
                 imageFile.delete();
+
             try {
                 imageFile.createNewFile();
                 FileOutputStream out = new FileOutputStream(imageFile);

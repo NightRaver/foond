@@ -1,4 +1,4 @@
-package tanagent.brian.com.foond;
+package tanagent.brian.com.foond.Yelp;
 
 import java.io.File;
 import java.net.URL;

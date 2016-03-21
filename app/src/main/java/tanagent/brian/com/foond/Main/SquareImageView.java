@@ -1,4 +1,4 @@
-package tanagent.brian.com.foond;
+package tanagent.brian.com.foond.Main;
 
 import android.content.Context;
 import android.util.AttributeSet;

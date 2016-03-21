@@ -1,8 +1,7 @@
-package tanagent.brian.com.foond;
+package tanagent.brian.com.foond.Yelp;
 
 import android.content.Context;
-import android.media.Image;
-import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,9 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import tanagent.brian.com.foond.R;
+import tanagent.brian.com.foond.Upload;
 
 /**
  * Created by Brian on 2/24/2016.
@@ -40,7 +42,7 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
         TextView restaurantName = (TextView) view.findViewById(R.id.restaurant_name);
         restaurantName.setText(yelpDetails.getRestaurantName());
 
-        TextView restaurantAddress = (TextView) view.findViewById(R.id.restaurant_address);
+        final TextView restaurantAddress = (TextView) view.findViewById(R.id.restaurant_address);
         restaurantAddress.setText(yelpDetails.getRestaurantAddress());
 
         TextView restaurantCity = (TextView) view.findViewById(R.id.restaurant_city);
@@ -48,6 +50,17 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
 
         ImageView restaurantImage = (ImageView) view.findViewById(R.id.restaurant_image);
         yelpImage.with(this.context).load(yelpDetails.getRestaurantImage()).into(restaurantImage);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), Upload.class);
+                intent.putExtra("restaurantName", yelpDetails.getRestaurantName());
+                intent.putExtra("restaurantAddress", yelpDetails.getRestaurantAddress());
+                v.getContext().startActivity(intent);
+            }
+        });
+
         return view;
     }
 }

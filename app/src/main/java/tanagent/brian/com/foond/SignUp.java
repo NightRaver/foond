@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import tanagent.brian.com.foond.Main.Main;
+
 /**
  * Created by Brian on 1/29/2016.
  */

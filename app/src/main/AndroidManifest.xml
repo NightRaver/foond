@@ -35,7 +35,7 @@
 
         </activity>
 
-        <activity android:name=".Main">
+        <activity android:name=".Main.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -54,7 +54,7 @@
 
         </activity>
 
-        <activity android:name=".Yelp">
+        <activity android:name=".Yelp.Yelp">
 
         </activity>
 

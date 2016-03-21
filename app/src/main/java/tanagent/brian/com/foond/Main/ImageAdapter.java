@@ -1,4 +1,4 @@
-package tanagent.brian.com.foond;
+package tanagent.brian.com.foond.Main;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import tanagent.brian.com.foond.R;
+import tanagent.brian.com.foond.Select;
 
 /**
  * Created by Brian on 2/3/2016.

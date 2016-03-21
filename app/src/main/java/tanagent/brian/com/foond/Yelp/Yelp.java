@@ -1,4 +1,4 @@
-package tanagent.brian.com.foond;
+package tanagent.brian.com.foond.Yelp;
 
 import android.Manifest;
 import android.app.Activity;
@@ -14,27 +14,17 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 
-//import com.google.android.gms.common.ConnectionResult;
-//import com.google.android.gms.common.api.GoogleApiClient;
-//import com.google.android.gms.location.LocationServices;
-import com.squareup.picasso.Picasso;
 import com.yelp.clientlib.connection.YelpAPI;
 import com.yelp.clientlib.connection.YelpAPIFactory;
 import com.yelp.clientlib.entities.SearchResponse;
-import com.yelp.clientlib.entities.options.BoundingBoxOptions;
-import com.yelp.clientlib.entities.options.CoordinateOptions;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +35,7 @@ import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
+import tanagent.brian.com.foond.R;
 
 /**
  * Created by Brian on 2/10/2016.
@@ -56,7 +47,7 @@ public class Yelp extends Activity {
     private static final String TOKEN_SECRET = "peiZEgUYyCGkpVStBbLOg3PMCiM";
 
     private YelpAPI yelpAPI;
-    private static final int numOfBusinesses = 15;
+    private static final int numOfBusinesses = 7;
     private static final double radiusFilter = 40000; // 25 miles (4000 meters)
     private static final int sort = 1;
 

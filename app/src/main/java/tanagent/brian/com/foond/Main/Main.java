@@ -1,9 +1,10 @@
-package tanagent.brian.com.foond;
+package tanagent.brian.com.foond.Main;
 
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,10 +15,15 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import tanagent.brian.com.foond.Constants;
+import tanagent.brian.com.foond.R;
+import tanagent.brian.com.foond.Upload;
 
 /**
  * Created by Brian on 1/30/2016.
@@ -51,6 +57,17 @@ public class Main extends AppCompatActivity {
                 s3.setRegion(Region.getRegion(Regions.US_EAST_1));
 
                 s3ObjList = s3.listObjects(Constants.BUCKET_NAME).getObjectSummaries();
+
+                ObjectMetadata metadata = s3.getObjectMetadata(Constants.BUCKET_NAME, "example.jpg");
+
+                // This is the one I need to use getUserMetaData
+                Log.i("Object Meta Data: ", metadata.getUserMetadata().toString());
+
+                // you can use this to iterate through keysets
+                Log.i("key", String.valueOf(metadata.getUserMetadata().keySet()));
+
+                //
+                Log.i("whatever", metadata.getUserMetadata().get("mykey"));
 
                 for (S3ObjectSummary summary : s3ObjList) {
                     foods.add(new Food("https://s3.amazonaws.com/" + summary.getBucketName() + "/" + summary.getKey()));
