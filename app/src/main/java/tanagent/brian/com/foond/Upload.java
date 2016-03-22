@@ -64,20 +64,13 @@ public class Upload extends Activity{
 
     private List<S3ObjectSummary> s3ObjList;
 
+    private String restaurantNameString, restaurantAddressString, restaurantCityString;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestWindowFeature(Window.FEATURE_PROGRESS);
         this.setContentView(R.layout.upload);
 
-        restaurantName = (TextView) findViewById(R.id.restaurant_name);
-        restaurantAddress = (TextView) findViewById(R.id.restaurant_address);
 
-        Intent intent = getIntent();
-
-        if(intent.hasExtra("restaurantName") && intent.hasExtra("restaurantAddress")) {
-            restaurantName.setText(intent.getExtras().getString("restaurantName"));
-            restaurantAddress.setText(intent.getExtras().getString("restaurantAddress"));
-        }
 
         transferUtility = Util.getTransferUtility(this);
 
@@ -88,7 +81,8 @@ public class Upload extends Activity{
             @Override
             public void onClick(View v) {
                 Intent yelpIntent = new Intent(Upload.this, Yelp.class);
-                startActivity(yelpIntent);
+//                startActivity(yelpIntent);
+                startActivityForResult(yelpIntent, 2);
             }
         });
 
@@ -119,9 +113,9 @@ public class Upload extends Activity{
             @Override
             public void onClick(View v) {
                 if(imageFile == null) {
-                    Toast.makeText(Upload.this, "Please upload a photo first", Toast.LENGTH_LONG).show();
-
-
+                    Toast.makeText(Upload.this, "Please upload a photo", Toast.LENGTH_LONG).show();
+                } else if(!getIntent().hasExtra("restaurantName") && !getIntent().hasExtra("restaurantAddress")) {
+                    Toast.makeText(Upload.this, "Please select a restaurant", Toast.LENGTH_LONG).show();
                 } else {
                     AsyncTask<Void, Integer, Void> task = new AsyncTask<Void, Integer, Void>() {
 
@@ -147,7 +141,10 @@ public class Upload extends Activity{
 
                             //create a map to store user metadata
                             Map<String, String> userMetadata = new HashMap<String,String>();
-                            userMetadata.put("MyKey","MyVal");
+//                            userMetadata.put("MyKey","MyVal");
+                            userMetadata.put("RestaurantName", getIntent().getExtras().getString("restaurantName"));
+                            userMetadata.put("RestaurantAddress", getIntent().getExtras().getString("restaurantAddress"));
+                            userMetadata.put("RestaurantCity", getIntent().getExtras().getString("restaurantCity"));
 
                             //call setUserMetadata on our ObjectMetadata object, passing it our map
                             myObjectMetadata.setUserMetadata(userMetadata);
@@ -173,9 +170,6 @@ public class Upload extends Activity{
                                 @Override
                                 public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
                                     progressBar.setMax((int) bytesTotal);
-                                    Log.i("id", String.valueOf(id));
-                                    Log.i("bytesCurrent", String.valueOf(bytesCurrent));
-                                    Log.i("bytesTotal", String.valueOf(bytesTotal));
                                     Integer current = new Integer((int) bytesCurrent);
                                     publishProgress(current);
                                 }
@@ -226,6 +220,22 @@ public class Upload extends Activity{
                 out.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+
+        if(requestCode == 2) {
+            if(data != null) {
+                // fetch the String
+                restaurantNameString = data.getStringExtra("restaurantName");
+                restaurantAddressString = data.getStringExtra("restaurantAddress");
+
+                restaurantName = (TextView) findViewById(R.id.restaurant_name);
+                restaurantAddress = (TextView) findViewById(R.id.restaurant_address);
+
+                if(restaurantNameString != null && restaurantAddressString != null) {
+                    restaurantName.setText(restaurantNameString);
+                    restaurantAddress.setText(restaurantAddressString);
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package tanagent.brian.com.foond.Yelp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -32,7 +33,7 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, final View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.yelp_item, parent, false);
@@ -42,7 +43,7 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
         TextView restaurantName = (TextView) view.findViewById(R.id.restaurant_name);
         restaurantName.setText(yelpDetails.getRestaurantName());
 
-        final TextView restaurantAddress = (TextView) view.findViewById(R.id.restaurant_address);
+        TextView restaurantAddress = (TextView) view.findViewById(R.id.restaurant_address);
         restaurantAddress.setText(yelpDetails.getRestaurantAddress());
 
         TextView restaurantCity = (TextView) view.findViewById(R.id.restaurant_city);
@@ -54,10 +55,13 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), Upload.class);
+                Intent intent = new Intent();
                 intent.putExtra("restaurantName", yelpDetails.getRestaurantName());
                 intent.putExtra("restaurantAddress", yelpDetails.getRestaurantAddress());
-                v.getContext().startActivity(intent);
+                intent.putExtra("restaurantCity", yelpDetails.getRestaurantCity());
+//                v.getContext().startActivity(intent);
+                ((Activity)context).setResult(2, intent);
+                ((Activity)context).finish();
             }
         });
 
