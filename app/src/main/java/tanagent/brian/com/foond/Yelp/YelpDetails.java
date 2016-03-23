@@ -12,13 +12,24 @@ public class YelpDetails {
     private String restaurantName;
     private String restaurantAddress;
     private String restaurantCity;
+    private String restaurantURL;
+    private String restaurantPhone;
+    private String restaurantRating;
+    private boolean restaurantAvailability;
 
     public YelpDetails(String restaurantImage, String restaurantName,
-                       String restaurantAddress, String restaurantCity) {
+                       String restaurantAddress, String restaurantCity,
+                       String restaurantURL, String restaurantPhone,
+                       String restaurantRating, boolean restaurantAvailability) {
+
         this.restaurantImage = restaurantImage;
         this.restaurantName = restaurantName;
         this.restaurantAddress = restaurantAddress;
         this.restaurantCity = restaurantCity;
+        this.restaurantURL = restaurantURL;
+        this.restaurantPhone = restaurantPhone;
+        this.restaurantRating = restaurantRating;
+        this.restaurantAvailability = restaurantAvailability;
     }
 
     public String getRestaurantImage() {
@@ -51,5 +62,38 @@ public class YelpDetails {
 
     public void setRestaurantCity(String restaurantCity) {
         this.restaurantCity = restaurantCity;
+    }
+
+    public String getRestaurantPhone() {
+        return restaurantPhone;
+    }
+
+    public void setRestaurantPhone(String restaurantPhone) {
+        this.restaurantPhone = restaurantPhone;
+    }
+
+    public String getRestaurantRating() {
+        return restaurantRating;
+    }
+
+    public void setRestaurantRating(String restaurantRating) {
+        this.restaurantRating = restaurantRating;
+    }
+
+    public boolean isRestaurantAvailability() {
+        return restaurantAvailability;
+    }
+
+    public void setRestaurantAvailability(boolean restaurantAvailability) {
+        this.restaurantAvailability = restaurantAvailability;
+    }
+
+    public String getRestaurantURL() {
+
+        return restaurantURL;
+    }
+
+    public void setRestaurantURL(String restaurantURL) {
+        this.restaurantURL = restaurantURL;
     }
 }

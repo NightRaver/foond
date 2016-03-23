@@ -61,6 +61,10 @@ public class Yelp extends Activity {
     private String restaurantAddress;
     private String restaurantImage;
     private String restaurantCity;
+    private String restaurantURL;
+    private String restaurantPhone;
+    private String restaurantRating;
+    private boolean restaurantAvailability;
 
     private List<YelpDetails> yelpList = new ArrayList<YelpDetails>();
 
@@ -212,9 +216,14 @@ public class Yelp extends Activity {
                         restaurantCity = searchResponse.businesses().get(i).location().city()
                                 + " " + searchResponse.businesses().get(i).location().postalCode();
                         restaurantImage = searchResponse.businesses().get(i).imageUrl();
+                        restaurantURL = searchResponse.businesses().get(i).mobileUrl();
+                        restaurantPhone = searchResponse.businesses().get(i).displayPhone();
+                        restaurantRating = searchResponse.businesses().get(i).ratingImgUrlSmall();
+                        restaurantAvailability = searchResponse.businesses().get(i).isClosed();
 
                         yelpList.add(new YelpDetails(restaurantImage, restaurantName,
-                                restaurantAddress, restaurantCity));
+                                restaurantAddress, restaurantCity, restaurantURL, restaurantPhone,
+                                restaurantRating, restaurantAvailability));
                     }
 
                     setProgressBarIndeterminateVisibility(false);
