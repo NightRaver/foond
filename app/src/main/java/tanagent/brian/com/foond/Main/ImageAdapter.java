@@ -1,5 +1,6 @@
 package tanagent.brian.com.foond.Main;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -8,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ public class ImageAdapter extends BaseAdapter {
     private Context context;
     private List<Food> foods = new ArrayList<Food>();
     private LayoutInflater inflater;
+    private ProgressBar progressBar;
 
     public ImageAdapter(Context context, List<Food> foods) {
         inflater = LayoutInflater.from(context);
@@ -54,6 +58,9 @@ public class ImageAdapter extends BaseAdapter {
         if(view == null) {
             view = inflater.inflate(R.layout.gridview_item, parent, false);
             view.setTag(R.id.picture, view.findViewById(R.id.picture));
+
+//            progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+//            progressBar.setVisibility(View.VISIBLE);
         }
 
         imageView = (ImageView) view.getTag(R.id.picture);
@@ -62,7 +69,16 @@ public class ImageAdapter extends BaseAdapter {
 
         final String imageUrl = food.foodId;
 
-        Picasso.with(view.getContext()).load(imageUrl).into(imageView);
+        Picasso.with(view.getContext()).load(imageUrl).placeholder(R.drawable.progress_image).into(imageView);
+
+//        Picasso.with(view.getContext()).load(imageUrl).into(imageView, new ImageLoadedCallback(progressBar){
+//            @Override
+//            public void onSuccess() {
+//                if (this.progressBar != null) {
+//                    this.progressBar.setVisibility(View.GONE);
+//                }
+//            }
+//        });
 
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,4 +92,23 @@ public class ImageAdapter extends BaseAdapter {
 
         return view;
     }
+
+    private class ImageLoadedCallback implements Callback {
+        ProgressBar progressBar;
+
+        public  ImageLoadedCallback(ProgressBar progBar){
+            progressBar = progBar;
+        }
+
+        @Override
+        public void onSuccess() {
+
+        }
+
+        @Override
+        public void onError() {
+
+        }
+    }
+
 }
