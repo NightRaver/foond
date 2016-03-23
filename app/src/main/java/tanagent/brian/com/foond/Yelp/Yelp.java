@@ -9,12 +9,16 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.yelp.clientlib.connection.YelpAPI;
 import com.yelp.clientlib.connection.YelpAPIFactory;
@@ -30,6 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -60,6 +66,7 @@ public class Yelp extends Activity {
 
     private ListView listView;
     private YelpAdapter yelpAdapter;
+    private ProgressBar progressBar;
 
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -79,6 +86,9 @@ public class Yelp extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.yelp);
 
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
             // Called when the location is updated
@@ -88,7 +98,7 @@ public class Yelp extends Activity {
                 longitude = location.getLongitude();
                 Log.i("Latitude:", String.valueOf(location.getLatitude()));
                 Log.i("Longitude:", String.valueOf(location.getLongitude()));
-                setUp();
+                new ProgressTask().execute();
             }
 
             @Override
@@ -135,90 +145,6 @@ public class Yelp extends Activity {
         locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
     }
 
-    public void setUp() {
-        // This library uses a YelpAPI object to query against the API
-        YelpAPIFactory yelpAPIFactory = new YelpAPIFactory(
-                CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET);
-
-        yelpAPI = yelpAPIFactory.createAPI();
-
-        final Map<String, String> params = new HashMap<>();
-
-        // general params
-        params.put("term", "food");
-        params.put("limit", String.valueOf(numOfBusinesses));
-        params.put("radius_filter", String.valueOf(radiusFilter));
-        params.put("sort", String.valueOf(sort));
-
-        // locale params
-        params.put("lang", "en");
-
-        // Execute the Call object to send the request
-        Log.i("Latitude1:", String.valueOf(latitude));
-        Log.i("Longitude1:", String.valueOf(longitude));
-        Geocoder geocoder;
-        List<Address> addresses;
-        geocoder = new Geocoder(this, Locale.getDefault());
-
-        // translates latitude and longitude to an address
-        try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            address = addresses.get(0).getAddressLine(0);
-            city = addresses.get(0).getLocality();
-            state = addresses.get(0).getAdminArea();
-            country = addresses.get(0).getCountryName();
-            postalCode = addresses.get(0).getPostalCode();
-            knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
-            Log.i("GeoCoder", addresses.get(0).getAddressLine(0).toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Call<SearchResponse> call = yelpAPI.search(address + ", " + city + ", " + state, params);
-
-        // Pass in a Callback object to send request asynchronously
-        Callback<SearchResponse> callback = new Callback<SearchResponse>() {
-            @Override
-            public void onResponse(Response<SearchResponse> response, Retrofit retrofit) {
-                SearchResponse searchResponse = response.body();
-
-                for (int i = 0; i < numOfBusinesses; i++) {
-                    restaurantName = searchResponse.businesses().get(i).name();
-                    restaurantAddress = searchResponse.businesses().get(i).location().displayAddress().get(0);
-                    restaurantCity = searchResponse.businesses().get(i).location().city()
-                            + " " + searchResponse.businesses().get(i).location().postalCode();
-                    restaurantImage = searchResponse.businesses().get(i).imageUrl();
-
-                    yelpList.add(new YelpDetails(restaurantImage, restaurantName,
-                            restaurantAddress, restaurantCity));
-                }
-
-                listView = (ListView) findViewById(R.id.yelp_results);
-                yelpAdapter = new YelpAdapter(Yelp.this, R.layout.yelp_item, yelpList);
-                listView.setAdapter(yelpAdapter);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                Log.e("TEST", "Failed", t);
-            }
-        };
-        call.enqueue(callback);
-    }
-
-    @Test
-    public void testSearchByLocation() throws IOException {
-        Map<String, String> params = new HashMap<>();
-        params.put("term", "yelp");
-
-        Call<SearchResponse> call = yelpAPI.search("37.77493,-122.419415", params);
-        Response<SearchResponse> response = call.execute();
-        Assert.assertEquals(200, response.code());
-
-        SearchResponse searchResponse = response.body();
-        Assert.assertNotNull(searchResponse);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -226,6 +152,91 @@ public class Yelp extends Activity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     configureButton();
                 return;
+        }
+    }
+
+    private class ProgressTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            // This library uses a YelpAPI object to query against the API
+            YelpAPIFactory yelpAPIFactory = new YelpAPIFactory(
+                    CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET);
+
+            yelpAPI = yelpAPIFactory.createAPI();
+
+            final Map<String, String> params = new HashMap<>();
+
+            // general params
+            params.put("term", "food");
+            params.put("limit", String.valueOf(numOfBusinesses));
+            params.put("radius_filter", String.valueOf(radiusFilter));
+            params.put("sort", String.valueOf(sort));
+
+            // locale params
+            params.put("lang", "en");
+
+            // Execute the Call object to send the request
+            Log.i("Latitude1:", String.valueOf(latitude));
+            Log.i("Longitude1:", String.valueOf(longitude));
+            Geocoder geocoder;
+            List<Address> addresses;
+            geocoder = new Geocoder(Yelp.this, Locale.getDefault());
+
+            // translates latitude and longitude to an address
+            try {
+                addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                address = addresses.get(0).getAddressLine(0);
+                city = addresses.get(0).getLocality();
+                state = addresses.get(0).getAdminArea();
+                country = addresses.get(0).getCountryName();
+                postalCode = addresses.get(0).getPostalCode();
+                knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+                Log.i("GeoCoder", addresses.get(0).getAddressLine(0).toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Call<SearchResponse> call = yelpAPI.search(address + ", " + city + ", " + state, params);
+
+            // Pass in a Callback object to send request asynchronously
+            Callback<SearchResponse> callback = new Callback<SearchResponse>() {
+                @Override
+                public void onResponse(Response<SearchResponse> response, Retrofit retrofit) {
+                    SearchResponse searchResponse = response.body();
+
+                    for (int i = 0; i < numOfBusinesses; i++) {
+                        restaurantName = searchResponse.businesses().get(i).name();
+                        restaurantAddress = searchResponse.businesses().get(i).location().displayAddress().get(0);
+                        restaurantCity = searchResponse.businesses().get(i).location().city()
+                                + " " + searchResponse.businesses().get(i).location().postalCode();
+                        restaurantImage = searchResponse.businesses().get(i).imageUrl();
+
+                        yelpList.add(new YelpDetails(restaurantImage, restaurantName,
+                                restaurantAddress, restaurantCity));
+                    }
+
+                    setProgressBarIndeterminateVisibility(false);
+
+                    listView = (ListView) findViewById(R.id.yelp_results);
+                    yelpAdapter = new YelpAdapter(Yelp.this, R.layout.yelp_item, yelpList);
+                    listView.setAdapter(yelpAdapter);
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e("TEST", "Failed", t);
+                }
+            };
+            call.enqueue(callback);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            progressBar.setVisibility(View.GONE);
         }
     }
 }

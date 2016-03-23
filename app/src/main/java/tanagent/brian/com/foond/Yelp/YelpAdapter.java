@@ -59,7 +59,6 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
                 intent.putExtra("restaurantName", yelpDetails.getRestaurantName());
                 intent.putExtra("restaurantAddress", yelpDetails.getRestaurantAddress());
                 intent.putExtra("restaurantCity", yelpDetails.getRestaurantCity());
-//                v.getContext().startActivity(intent);
                 ((Activity)context).setResult(2, intent);
                 ((Activity)context).finish();
             }

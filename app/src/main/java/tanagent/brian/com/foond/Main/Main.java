@@ -66,7 +66,7 @@ public class Main extends AppCompatActivity {
                 // you can use this to iterate through keysets
                 Log.i("key", String.valueOf(metadata.getUserMetadata().keySet()));
 
-                //
+                // you can use this to get the value
                 Log.i("whatever", metadata.getUserMetadata().get("mykey"));
 
                 for (S3ObjectSummary summary : s3ObjList) {

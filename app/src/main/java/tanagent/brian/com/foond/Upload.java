@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import tanagent.brian.com.foond.Yelp.Yelp;
 
@@ -59,18 +60,15 @@ public class Upload extends Activity{
     private Button submitButton, selectImageButton, selectRestaurant;
     private ProgressBar progressBar;
     private TextView restaurantName, restaurantAddress;
-    private Firebase firebase;
     private File imageFile;
 
     private List<S3ObjectSummary> s3ObjList;
 
-    private String restaurantNameString, restaurantAddressString, restaurantCityString;
+    private String restaurantNameString, restaurantAddressString, restaurantCityString, fileName;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.upload);
-
-
 
         transferUtility = Util.getTransferUtility(this);
 
@@ -81,7 +79,6 @@ public class Upload extends Activity{
             @Override
             public void onClick(View v) {
                 Intent yelpIntent = new Intent(Upload.this, Yelp.class);
-//                startActivity(yelpIntent);
                 startActivityForResult(yelpIntent, 2);
             }
         });
@@ -151,7 +148,8 @@ public class Upload extends Activity{
 
                             observer = transferUtility.upload(
                                     Constants.BUCKET_NAME,     /* The bucket to upload to */
-                                    imageFile.getName(),       /* The key for the uploaded object */
+//                                    imageFile.getName(),       /* The key for the uploaded object */
+                                    fileName,
                                     imageFile,                  /* The file where the data to upload exists */
                                     myObjectMetadata
                             );
@@ -208,7 +206,8 @@ public class Upload extends Activity{
             Drawable mDrawable = foodImage.getDrawable();
             Bitmap mBitmap = drawableToBitmap(mDrawable);
 
-            imageFile = new File(getFilesDir(), "example" + ".jpg");
+            fileName = UUID.randomUUID().toString();
+            imageFile = new File(getFilesDir(), fileName + ".jpg");
 
             if(imageFile.exists())
                 imageFile.delete();
@@ -262,17 +261,17 @@ public class Upload extends Activity{
         return bitmap;
     }
 
-    private String getRealPathFromURI(Uri contentURI) {
-        String result;
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
-    }
+//    private String getRealPathFromURI(Uri contentURI) {
+//        String result;
+//        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+//        if (cursor == null) { // Source is Dropbox or other similar local file path
+//            result = contentURI.getPath();
+//        } else {
+//            cursor.moveToFirst();
+//            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+//            result = cursor.getString(idx);
+//            cursor.close();
+//        }
+//        return result;
+//    }
 }
