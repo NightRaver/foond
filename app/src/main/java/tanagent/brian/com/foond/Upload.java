@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +34,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.firebase.client.Firebase;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -55,16 +57,28 @@ public class Upload extends Activity{
     private TransferObserver observer;
 
     private static final int RESULT_LOAD_IMAGE = 1;
+    private static final int RESULT_YELP_DATA = 2;
+    private static final int CAM_REQUEST = 3;
     private static final String TAG = "Upload";
     private ImageView foodImage;
     private Button submitButton, selectImageButton, selectRestaurant;
+    private Button cameryButton;
     private ProgressBar progressBar;
     private TextView restaurantName, restaurantAddress;
     private File imageFile;
 
     private List<S3ObjectSummary> s3ObjList;
 
-    private String restaurantNameString, restaurantAddressString, restaurantCityString, fileName;
+    private String restaurantNameString,
+            restaurantAddressString,
+            restaurantCityString,
+            restaurantImgString,
+            restaurantURLString,
+            restaurantPhoneString,
+            restaurantRatingString,
+            fileName;
+
+    private boolean restaurantAvailability;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,17 +118,35 @@ public class Upload extends Activity{
             }
         });
 
+        cameryButton = (Button) findViewById(R.id.camera_button);
+        cameryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                File file = getFile();
+//                camera_intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+//                startActivityForResult(camera_intent, CAM_REQUEST);
+
+                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, CAM_REQUEST);
+            }
+        });
 
         submitButton = (Button) findViewById(R.id.submit);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(imageFile == null) {
+                if (imageFile == null) {
                     Toast.makeText(Upload.this, "Please upload a photo", Toast.LENGTH_LONG).show();
-                } else if(!getIntent().hasExtra("restaurantName") && !getIntent().hasExtra("restaurantAddress")) {
+                } else if (restaurantNameString == null || restaurantAddressString == null) {
                     Toast.makeText(Upload.this, "Please select a restaurant", Toast.LENGTH_LONG).show();
                 } else {
                     AsyncTask<Void, Integer, Void> task = new AsyncTask<Void, Integer, Void>() {
+
+                        @Override
+                        protected void onPreExecute() {
+                            Toast.makeText(Upload.this, "Uploading...", Toast.LENGTH_SHORT).show();
+                        }
 
                         @Override
                         protected Void doInBackground(Void... params) {
@@ -137,11 +169,16 @@ public class Upload extends Activity{
                             ObjectMetadata myObjectMetadata = new ObjectMetadata();
 
                             //create a map to store user metadata
-                            Map<String, String> userMetadata = new HashMap<String,String>();
+                            Map<String, String> userMetadata = new HashMap<String, String>();
 //                            userMetadata.put("MyKey","MyVal");
-                            userMetadata.put("RestaurantName", getIntent().getExtras().getString("restaurantName"));
-                            userMetadata.put("RestaurantAddress", getIntent().getExtras().getString("restaurantAddress"));
-                            userMetadata.put("RestaurantCity", getIntent().getExtras().getString("restaurantCity"));
+                            userMetadata.put("name", restaurantNameString);
+                            userMetadata.put("address", restaurantAddressString);
+                            userMetadata.put("city", restaurantCityString);
+                            userMetadata.put("img", restaurantImgString);
+                            userMetadata.put("url", restaurantURLString);
+                            userMetadata.put("phone", restaurantPhoneString);
+                            userMetadata.put("rating", restaurantRatingString);
+                            userMetadata.put("avail", String.valueOf(restaurantAvailability));
 
                             //call setUserMetadata on our ObjectMetadata object, passing it our map
                             myObjectMetadata.setUserMetadata(userMetadata);
@@ -206,8 +243,10 @@ public class Upload extends Activity{
             Drawable mDrawable = foodImage.getDrawable();
             Bitmap mBitmap = drawableToBitmap(mDrawable);
 
-            fileName = UUID.randomUUID().toString();
-            imageFile = new File(getFilesDir(), fileName + ".jpg");
+            if (fileName == null || imageFile == null) {
+                fileName = UUID.randomUUID().toString() + ".jpg";
+                imageFile = new File(getFilesDir(), fileName);
+            }
 
             if(imageFile.exists())
                 imageFile.delete();
@@ -222,11 +261,17 @@ public class Upload extends Activity{
             }
         }
 
-        if(requestCode == 2) {
+        if(requestCode == RESULT_YELP_DATA) {
             if(data != null) {
                 // fetch the String
                 restaurantNameString = data.getStringExtra("restaurantName");
                 restaurantAddressString = data.getStringExtra("restaurantAddress");
+                restaurantCityString = data.getStringExtra("restaurantCity");
+                restaurantImgString = data.getStringExtra("restaurantImg");
+                restaurantURLString = data.getStringExtra("restaurantURL");
+                restaurantPhoneString = data.getStringExtra("restaurantPhone");
+                restaurantRatingString = data.getStringExtra("restaurantRating");
+                restaurantAvailability = data.getBooleanExtra("restaurantAvailability", false);
 
                 restaurantName = (TextView) findViewById(R.id.restaurant_name);
                 restaurantAddress = (TextView) findViewById(R.id.restaurant_address);
@@ -235,6 +280,34 @@ public class Upload extends Activity{
                     restaurantName.setText(restaurantNameString);
                     restaurantAddress.setText(restaurantAddressString);
                 }
+            }
+        }
+
+        if(requestCode == CAM_REQUEST) {
+
+            Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+            foodImage.setImageBitmap(thumbnail);
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+//            imageFile = new File(Environment.getExternalStorageDirectory()+File.separator + "image.jpg");
+
+            if (fileName == null || imageFile == null) {
+                fileName = UUID.randomUUID().toString() + ".jpg";
+                imageFile = new File(getFilesDir(), fileName);
+            }
+
+            if(imageFile.exists())
+                imageFile.delete();
+
+            try {
+                imageFile.createNewFile();
+                FileOutputStream fo = new FileOutputStream(imageFile);
+                fo.write(bytes.toByteArray());
+                fo.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
     }
@@ -260,18 +333,4 @@ public class Upload extends Activity{
         drawable.draw(canvas);
         return bitmap;
     }
-
-//    private String getRealPathFromURI(Uri contentURI) {
-//        String result;
-//        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-//        if (cursor == null) { // Source is Dropbox or other similar local file path
-//            result = contentURI.getPath();
-//        } else {
-//            cursor.moveToFirst();
-//            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-//            result = cursor.getString(idx);
-//            cursor.close();
-//        }
-//        return result;
-//    }
 }

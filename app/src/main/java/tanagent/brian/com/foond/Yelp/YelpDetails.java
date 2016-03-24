@@ -89,7 +89,6 @@ public class YelpDetails {
     }
 
     public String getRestaurantURL() {
-
         return restaurantURL;
     }
 

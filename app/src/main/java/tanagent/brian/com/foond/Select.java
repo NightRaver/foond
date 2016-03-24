@@ -28,6 +28,7 @@ public class Select extends Activity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Select.this, MainActivity.class);
+                intent.putExtra("key", getIntent().getExtras().getString("key"));
                 startActivity(intent);
             }
         });

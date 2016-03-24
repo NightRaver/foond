@@ -58,16 +58,17 @@ public class Main extends AppCompatActivity {
 
                 s3ObjList = s3.listObjects(Constants.BUCKET_NAME).getObjectSummaries();
 
-                ObjectMetadata metadata = s3.getObjectMetadata(Constants.BUCKET_NAME, "example.jpg");
-
-                // This is the one I need to use getUserMetaData
-                Log.i("Object Meta Data: ", metadata.getUserMetadata().toString());
-
-                // you can use this to iterate through keysets
-                Log.i("key", String.valueOf(metadata.getUserMetadata().keySet()));
-
-                // you can use this to get the value
-                Log.i("whatever", metadata.getUserMetadata().get("mykey"));
+//                // get the image name
+//                ObjectMetadata metadata = s3.getObjectMetadata(Constants.BUCKET_NAME, "a6a3ff86-8e70-4110-9d45-678c43502f6c.jpg");
+//
+//                // This is the one I need to use getUserMetaData
+//                Log.i("Object Meta Data: ", metadata.getUserMetadata().toString());
+//
+//                // you can use this to iterate through keysets
+//                Log.i("key", String.valueOf(metadata.getUserMetadata().keySet()));
+//
+//                // you can use this to get the value
+//                Log.i("whatever", metadata.getUserMetadata().get("name"));
 
                 for (S3ObjectSummary summary : s3ObjList) {
                     foods.add(new Food("https://s3.amazonaws.com/" + summary.getBucketName() + "/" + summary.getKey()));

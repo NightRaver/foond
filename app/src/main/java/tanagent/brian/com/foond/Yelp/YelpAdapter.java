@@ -55,10 +55,17 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent();
                 intent.putExtra("restaurantName", yelpDetails.getRestaurantName());
                 intent.putExtra("restaurantAddress", yelpDetails.getRestaurantAddress());
                 intent.putExtra("restaurantCity", yelpDetails.getRestaurantCity());
+                intent.putExtra("restaurantImg", yelpDetails.getRestaurantImage());
+                intent.putExtra("restaurantURL", yelpDetails.getRestaurantURL());
+                intent.putExtra("restaurantPhone", yelpDetails.getRestaurantPhone());
+                intent.putExtra("restaurantRating", yelpDetails.getRestaurantRating());
+                intent.putExtra("restaurantAvailability", yelpDetails.isRestaurantAvailability());
+
                 ((Activity)context).setResult(2, intent);
                 ((Activity)context).finish();
             }

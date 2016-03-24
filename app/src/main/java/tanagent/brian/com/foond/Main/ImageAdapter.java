@@ -84,9 +84,14 @@ public class ImageAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), Select.class);
+                String[] splitString = imageUrl.split("/");
+                String key = splitString[4];
+                Log.i("key", key);
                 intent.putExtra("url", imageUrl);
+                intent.putExtra("key", key);
                 v.getContext().startActivity(intent);
                 Log.i("url", imageUrl.toString());
+
             }
         });
 
