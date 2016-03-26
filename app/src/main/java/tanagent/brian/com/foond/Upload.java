@@ -72,6 +72,8 @@ public class Upload extends Activity{
     private String restaurantNameString,
             restaurantAddressString,
             restaurantCityString,
+            restaurantStateString,
+            restaurantZipString,
             restaurantImgString,
             restaurantURLString,
             restaurantPhoneString,
@@ -174,6 +176,8 @@ public class Upload extends Activity{
                             userMetadata.put("name", restaurantNameString);
                             userMetadata.put("address", restaurantAddressString);
                             userMetadata.put("city", restaurantCityString);
+                            userMetadata.put("state", restaurantStateString);
+                            userMetadata.put("zip", restaurantZipString);
                             userMetadata.put("img", restaurantImgString);
                             userMetadata.put("url", restaurantURLString);
                             userMetadata.put("phone", restaurantPhoneString);
@@ -184,9 +188,8 @@ public class Upload extends Activity{
                             myObjectMetadata.setUserMetadata(userMetadata);
 
                             observer = transferUtility.upload(
-                                    Constants.BUCKET_NAME,     /* The bucket to upload to */
-//                                    imageFile.getName(),       /* The key for the uploaded object */
-                                    fileName,
+                                    Constants.BUCKET_NAME,      /* The bucket to upload to */
+                                    fileName,                   /* The key for the uploaded object */
                                     imageFile,                  /* The file where the data to upload exists */
                                     myObjectMetadata
                             );
@@ -267,6 +270,8 @@ public class Upload extends Activity{
                 restaurantNameString = data.getStringExtra("restaurantName");
                 restaurantAddressString = data.getStringExtra("restaurantAddress");
                 restaurantCityString = data.getStringExtra("restaurantCity");
+                restaurantStateString = data.getStringExtra("restaurantState");
+                restaurantZipString = data.getStringExtra("restaurantZip");
                 restaurantImgString = data.getStringExtra("restaurantImg");
                 restaurantURLString = data.getStringExtra("restaurantURL");
                 restaurantPhoneString = data.getStringExtra("restaurantPhone");

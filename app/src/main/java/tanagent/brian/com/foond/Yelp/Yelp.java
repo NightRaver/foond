@@ -56,11 +56,15 @@ public class Yelp extends Activity {
     private static final int numOfBusinesses = 7;
     private static final double radiusFilter = 40000; // 25 miles (4000 meters)
     private static final int sort = 1;
+    private static final String category_filter = "food";
+    private static final String term = "foods";
 
     private String restaurantName;
     private String restaurantAddress;
     private String restaurantImage;
     private String restaurantCity;
+    private String restaurantState;
+    private String restaurantZip;
     private String restaurantURL;
     private String restaurantPhone;
     private String restaurantRating;
@@ -173,10 +177,11 @@ public class Yelp extends Activity {
             final Map<String, String> params = new HashMap<>();
 
             // general params
-            params.put("term", "food");
+            params.put("term", term);
             params.put("limit", String.valueOf(numOfBusinesses));
             params.put("radius_filter", String.valueOf(radiusFilter));
             params.put("sort", String.valueOf(sort));
+//            params.put("category_filter", category_filter);
 
             // locale params
             params.put("lang", "en");
@@ -202,7 +207,11 @@ public class Yelp extends Activity {
                 e.printStackTrace();
             }
 
+            params.put("latitude", String.valueOf(latitude));
+            params.put("longitude", String.valueOf(longitude));
+
             Call<SearchResponse> call = yelpAPI.search(address + ", " + city + ", " + state, params);
+//            Call<SearchResponse> call = yelpAPI.search("cll=latitude,longitude", params);
 
             // Pass in a Callback object to send request asynchronously
             Callback<SearchResponse> callback = new Callback<SearchResponse>() {
@@ -213,8 +222,9 @@ public class Yelp extends Activity {
                     for (int i = 0; i < numOfBusinesses; i++) {
                         restaurantName = searchResponse.businesses().get(i).name();
                         restaurantAddress = searchResponse.businesses().get(i).location().displayAddress().get(0);
-                        restaurantCity = searchResponse.businesses().get(i).location().city()
-                                + " " + searchResponse.businesses().get(i).location().postalCode();
+                        restaurantCity = searchResponse.businesses().get(i).location().city();
+                        restaurantState = searchResponse.businesses().get(i).location().stateCode();
+                        restaurantZip = searchResponse.businesses().get(i).location().postalCode();
                         restaurantImage = searchResponse.businesses().get(i).imageUrl();
                         restaurantURL = searchResponse.businesses().get(i).mobileUrl();
                         restaurantPhone = searchResponse.businesses().get(i).displayPhone();
@@ -222,8 +232,8 @@ public class Yelp extends Activity {
                         restaurantAvailability = searchResponse.businesses().get(i).isClosed();
 
                         yelpList.add(new YelpDetails(restaurantImage, restaurantName,
-                                restaurantAddress, restaurantCity, restaurantURL, restaurantPhone,
-                                restaurantRating, restaurantAvailability));
+                                restaurantAddress, restaurantCity, restaurantState, restaurantZip,
+                                restaurantURL, restaurantPhone, restaurantRating, restaurantAvailability));
                     }
 
                     setProgressBarIndeterminateVisibility(false);

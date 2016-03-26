@@ -12,6 +12,8 @@ public class YelpDetails {
     private String restaurantName;
     private String restaurantAddress;
     private String restaurantCity;
+    private String restaurantState;
+    private String restaurantZip;
     private String restaurantURL;
     private String restaurantPhone;
     private String restaurantRating;
@@ -19,6 +21,7 @@ public class YelpDetails {
 
     public YelpDetails(String restaurantImage, String restaurantName,
                        String restaurantAddress, String restaurantCity,
+                       String restaurantState, String restaurantZip,
                        String restaurantURL, String restaurantPhone,
                        String restaurantRating, boolean restaurantAvailability) {
 
@@ -26,6 +29,8 @@ public class YelpDetails {
         this.restaurantName = restaurantName;
         this.restaurantAddress = restaurantAddress;
         this.restaurantCity = restaurantCity;
+        this.restaurantState = restaurantState;
+        this.restaurantZip = restaurantZip;
         this.restaurantURL = restaurantURL;
         this.restaurantPhone = restaurantPhone;
         this.restaurantRating = restaurantRating;
@@ -90,6 +95,22 @@ public class YelpDetails {
 
     public String getRestaurantURL() {
         return restaurantURL;
+    }
+
+    public String getRestaurantState() {
+        return restaurantState;
+    }
+
+    public void setRestaurantState(String restaurantState) {
+        this.restaurantState = restaurantState;
+    }
+
+    public String getRestaurantZip() {
+        return restaurantZip;
+    }
+
+    public void setRestaurantZip(String restaurantZip) {
+        this.restaurantZip = restaurantZip;
     }
 
     public void setRestaurantURL(String restaurantURL) {

@@ -60,6 +60,8 @@ public class YelpAdapter extends ArrayAdapter<YelpDetails> {
                 intent.putExtra("restaurantName", yelpDetails.getRestaurantName());
                 intent.putExtra("restaurantAddress", yelpDetails.getRestaurantAddress());
                 intent.putExtra("restaurantCity", yelpDetails.getRestaurantCity());
+                intent.putExtra("restaurantState", yelpDetails.getRestaurantState());
+                intent.putExtra("restaurantZip", yelpDetails.getRestaurantZip());
                 intent.putExtra("restaurantImg", yelpDetails.getRestaurantImage());
                 intent.putExtra("restaurantURL", yelpDetails.getRestaurantURL());
                 intent.putExtra("restaurantPhone", yelpDetails.getRestaurantPhone());
