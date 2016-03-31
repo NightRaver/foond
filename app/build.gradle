@@ -10,6 +10,7 @@ android {
         targetSdkVersion 23
         versionCode 4
         versionName "1.4"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -53,9 +54,13 @@ dependencies {
     // Firebase
     compile 'com.firebase:firebase-client-android:2.5.0+'
     // Google Play services
-//    compile 'com.google.android.gms:play-services:8.4.0'
+    compile 'com.google.android.gms:play-services-maps:8.4.0'
+    compile 'com.google.android.gms:play-services-plus:8.4.0'
+    // AWS
     compile 'com.amazonaws:aws-android-sdk-core:2.+'
     compile 'com.amazonaws:aws-android-sdk-cognito:2.+'
     compile 'com.amazonaws:aws-android-sdk-s3:2.+'
     compile 'com.amazonaws:aws-android-sdk-ddb:2.+'
+
+    compile 'com.android.support:multidex:1.0.0'
 }

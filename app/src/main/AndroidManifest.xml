@@ -60,6 +60,13 @@
 
         </activity>
 
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBQsrFdiBeAe7RoG9JdEBlFRVQvBFc3R5c"/>
+
+        <activity android:name=".GMap">
+
+        </activity>
+
     </application>
 
 </manifest>

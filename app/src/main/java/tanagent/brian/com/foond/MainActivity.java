@@ -1,5 +1,6 @@
 package tanagent.brian.com.foond;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -93,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
         navButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Navigating...", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, GMap.class);
+                startActivity(intent);
                 Log.i("key", getIntent().getExtras().getString("key"));
             }
         });

@@ -23,6 +23,7 @@ import android.widget.ProgressBar;
 import com.yelp.clientlib.connection.YelpAPI;
 import com.yelp.clientlib.connection.YelpAPIFactory;
 import com.yelp.clientlib.entities.SearchResponse;
+import com.yelp.clientlib.entities.options.CoordinateOptions;
 
 import junit.framework.Assert;
 
@@ -53,11 +54,11 @@ public class Yelp extends Activity {
     private static final String TOKEN_SECRET = "peiZEgUYyCGkpVStBbLOg3PMCiM";
 
     private YelpAPI yelpAPI;
-    private static final int numOfBusinesses = 7;
-    private static final double radiusFilter = 40000; // 25 miles (4000 meters)
+    private static final int numOfBusinesses = 10;
+    private static final double radiusFilter = 10000; // 0.62 miles (1000 meters)
     private static final int sort = 1;
     private static final String category_filter = "food";
-    private static final String term = "foods";
+    private static final String term = "restaurants";
 
     private String restaurantName;
     private String restaurantAddress;
@@ -104,8 +105,6 @@ public class Yelp extends Activity {
             public void onLocationChanged(Location location) {
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
-                Log.i("Latitude:", String.valueOf(location.getLatitude()));
-                Log.i("Longitude:", String.valueOf(location.getLongitude()));
                 new ProgressTask().execute();
             }
 
@@ -187,8 +186,6 @@ public class Yelp extends Activity {
             params.put("lang", "en");
 
             // Execute the Call object to send the request
-            Log.i("Latitude1:", String.valueOf(latitude));
-            Log.i("Longitude1:", String.valueOf(longitude));
             Geocoder geocoder;
             List<Address> addresses;
             geocoder = new Geocoder(Yelp.this, Locale.getDefault());
@@ -207,11 +204,11 @@ public class Yelp extends Activity {
                 e.printStackTrace();
             }
 
-            params.put("latitude", String.valueOf(latitude));
-            params.put("longitude", String.valueOf(longitude));
+            CoordinateOptions coordinate = CoordinateOptions.builder()
+                    .latitude(latitude)
+                    .longitude(longitude).build();
 
-            Call<SearchResponse> call = yelpAPI.search(address + ", " + city + ", " + state, params);
-//            Call<SearchResponse> call = yelpAPI.search("cll=latitude,longitude", params);
+            Call<SearchResponse> call = yelpAPI.search(coordinate, params);
 
             // Pass in a Callback object to send request asynchronously
             Callback<SearchResponse> callback = new Callback<SearchResponse>() {
