@@ -8,40 +8,42 @@
     android:orientation="vertical"
     android:background="#ef9e68">
 
-    <ImageView
-        android:id="@+id/restaurant_image"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.5"
-        android:scaleType="fitXY"/>
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:layout_weight="0">
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/restaurant_image"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:scaleType="centerCrop"/>
 
         <TextView
             android:id="@+id/restaurant_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="Restaurant Name"
+            android:textColor="#000000"
             android:textStyle="bold"
-            android:textSize="25sp" />
+            android:textSize="30sp" />
 
         <ImageView
             android:id="@+id/restaurant_rating"
-            android:layout_toRightOf="@+id/restaurant_name"
+            android:layout_below="@+id/restaurant_name"
             android:scaleType="fitStart"
             android:layout_width="match_parent"
             android:layout_height="20dp" />
 
     </RelativeLayout>
 
-    <Space
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/map"
+        tools:context=".GMap"
+        class="com.google.android.gms.maps.MapFragment"/>
 
     <Button
         android:id="@+id/navButton"

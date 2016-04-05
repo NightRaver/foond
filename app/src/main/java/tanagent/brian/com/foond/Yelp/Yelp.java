@@ -55,7 +55,7 @@ public class Yelp extends Activity {
 
     private YelpAPI yelpAPI;
     private static final int numOfBusinesses = 10;
-    private static final double radiusFilter = 5000; // 3.1 miles (5000 meters)
+    private static final double radiusFilter = 2500; // 1.5 miles (2500 meters)
     private static final int sort = 1;
     private static final String category_filter = "food";
     private static final String term = "restaurants";
