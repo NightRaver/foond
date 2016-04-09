@@ -144,7 +144,6 @@ public class Yelp extends Activity {
         } else {
             configureButton();
         }
-
     }
 
     @SuppressWarnings("ResourceType")

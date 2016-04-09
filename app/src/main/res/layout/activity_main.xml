@@ -8,42 +8,101 @@
     android:orientation="vertical"
     android:background="#ef9e68">
 
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <ImageView
             android:id="@+id/restaurant_image"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="match_parent"
             android:scaleType="centerCrop"/>
 
-        <TextView
-            android:id="@+id/restaurant_name"
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="Restaurant Name"
-            android:textColor="#000000"
-            android:textStyle="bold"
-            android:textSize="30sp" />
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/restaurant_rating"
-            android:layout_below="@+id/restaurant_name"
-            android:scaleType="fitStart"
-            android:layout_width="match_parent"
-            android:layout_height="20dp" />
+            <TextView
+                android:id="@+id/restaurant_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Restaurant Name"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="30sp" />
 
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/restaurant_rating"
+                android:layout_below="@+id/restaurant_name"
+                android:scaleType="fitStart"
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+        </RelativeLayout>
+    </FrameLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/map"
-        tools:context=".GMap"
-        class="com.google.android.gms.maps.MapFragment"/>
+        android:layout_weight="1">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map"
+            class="com.google.android.gms.maps.SupportMapFragment"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_alignParentRight="true"
+                android:id="@+id/restaurant_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:hint="Address "/>
+
+            <TextView
+                android:id="@+id/restaurant_city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/restaurant_address"
+                android:layout_toLeftOf="@+id/restaurant_state"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:text="City "/>
+
+            <TextView
+                android:id="@+id/restaurant_zip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/restaurant_address"
+                android:layout_alignParentRight="true"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:text="ZIP"/>
+
+            <TextView
+                android:id="@+id/restaurant_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/restaurant_address"
+                android:layout_toLeftOf="@+id/restaurant_zip"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:text="State "/>
+        </RelativeLayout>
+
+    </FrameLayout>
 
     <Button
         android:id="@+id/navButton"
@@ -53,37 +112,12 @@
         android:hint="Navigate Here?"
         android:layout_weight="0"/>
 
-    <TextView
-        android:id="@+id/restaurant_address"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Address"
-        android:gravity="center"
-        android:layout_weight="0"/>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center">
 
-        <TextView
-            android:id="@+id/restaurant_city"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="City"/>
-
-        <TextView
-            android:id="@+id/restaurant_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="State"/>
-
-        <TextView
-            android:id="@+id/restaurant_zip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ZIP"/>
     </LinearLayout>
 
 </LinearLayout>
